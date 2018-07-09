@@ -17,7 +17,7 @@
     Table 35 — Standard library feature-test macros
 Macro name                                  Value   Headers
 __cpp_lib_addressof_constexpr               201603L <memory>
-__cpp_lib_allocator_traits_is_always_equal  201411L <memory> <scoped_allocator> <string> 
+__cpp_lib_allocator_traits_is_always_equal  201411L <memory> <scoped_allocator> <string>
                                                     <deque> <forward_list> <list> <vector>
                                                     <map> <set> <unordered_map> <unordered_set>
 __cpp_lib_any                               201606L <any>
@@ -114,6 +114,9 @@ __cpp_lib_void_t                            201411L <type_traits>
 #endif
 
 #if _LIBCPP_STD_VER > 17
+# if !defined(_LIBCPP_HAS_NO_CONCEPTS)
+#  define __cpp_lib_concepts 201806L
+# endif
 #endif
 
 #endif  // _LIBCPP_VERSIONH
