@@ -350,9 +350,9 @@ namespace std
       template <class T> inline constexpr bool is_nothrow_move_assignable_v
         = is_nothrow_move_assignable<T>::value;                          // C++17
       template <class T, class U> inline constexpr bool is_nothrow_swappable_with_v
-        = is_nothrow_swappable_with<T, U>::value;                       // C++17
+        = is_nothrow_swappable_with<T, U>::value;                        // C++17
       template <class T> inline constexpr bool is_nothrow_swappable_v
-        = is_nothrow_swappable<T>::value;                               // C++17
+        = is_nothrow_swappable<T>::value;                                // C++17
       template <class T> inline constexpr bool is_nothrow_destructible_v
         = is_nothrow_destructible<T>::value;                             // C++17
       template <class T> inline constexpr bool has_virtual_destructor_v
@@ -395,6 +395,11 @@ namespace std
       template<class B>
         inline constexpr bool negation_v = negation<B>::value;           // C++17
 
+      template <class T, class U, template <class> class TQual, template <class> class UQual>
+        struct basic_common_reference { };                                 // C++20
+      template <class... T> struct common_reference;                       // C++20
+      template <class... T>                                                // C++20
+        using common_reference_t = typename common_reference<T...>::type;  // C++20
 }
 
 */
@@ -413,6 +418,11 @@ template <class _Tp> struct _LIBCPP_TEMPLATE_VIS hash;
 
 template <class>
 struct __void_t { typedef void type; };
+
+#if _LIBCPP_STD_VER > 14
+#define __cpp_lib_void_t 201411
+template <class...> using void_t = void;
+#endif // _LIBCPP_STD_VER > 14
 
 template <class _Tp>
 struct __identity { typedef _Tp type; };
@@ -2098,8 +2108,33 @@ struct _LIBCPP_TEMPLATE_VIS common_type<_Tp>
 
 // bullet 3 - sizeof...(Tp) == 2
 
+#if _LIBCPP_STD_VER > 17
+// Let COND_RES(X, Y) be:
+template <class _Tp, class _Up>
+using __cond_res =
+    decltype(false ? _VSTD::declval<_Tp(&)()>()() : _VSTD::declval<_Up(&)()>()());
+
+template <class _Tp, class _Up, class = void>
+struct __common_type3 {};
+
+// sub-bullet 4 - "if COND_RES(CREF(D1), CREF(D2)) denotes a type..."
+template <class _Tp>
+using __cref = add_lvalue_reference_t<const _Tp>;
+
+template <class _Tp, class _Up>
+struct __common_type3<_Tp, _Up, void_t<__cond_res<__cref<_Tp>, __cref<_Up>>>>
+{
+    using type = decay_t<__cond_res<__cref<_Tp>, __cref<_Up>>>;
+};
+
+template <class _Tp, class _Up, class = void>
+struct __common_type2_imp : __common_type3<_Tp, _Up> {};
+#else  // ^^^ _LIBCPP_STD_VER > 17 / _LIBCPP_STD_VER <= 17 vvv
 template <class _Tp, class _Up, class = void>
 struct __common_type2_imp {};
+#endif // _LIBCPP_STD_VER > 17
+
+// sub-bullet 3 - "if decay_t<decltype(false ? declval<D1>() : declval<D2>())> ..."
 
 template <class _Tp, class _Up>
 struct __common_type2_imp<_Tp, _Up,
@@ -2111,6 +2146,8 @@ struct __common_type2_imp<_Tp, _Up,
         true ? _VSTD::declval<_Tp>() : _VSTD::declval<_Up>()
     )>::type type;
 };
+
+// sub-bullet 1 - "If is_same_v<T1, D1> is false or ..."
 
 template <class _Tp, class _Up,
           class _DTp = typename decay<_Tp>::type,
@@ -2158,7 +2195,174 @@ struct _LIBCPP_TEMPLATE_VIS common_type<_Tp, _Up, _Vp...>
 template <class ..._Tp> using common_type_t = typename common_type<_Tp...>::type;
 #endif
 
-#endif  // _LIBCPP_HAS_NO_VARIADICS
+#if _LIBCPP_STD_VER > 17
+
+template <class, class, template <class> class, template <class> class>
+struct _LIBCPP_TEMPLATE_VIS basic_common_reference
+{};
+
+// Let COPYCV(FROM, TO) be an alias for type TO with the addition of FROM’s
+// top-level cv-qualifiers.
+template <class _Tp>
+struct __copy_cv_
+{
+    template <class _Up> using __fn = _Up;
+};
+template <class _Tp>
+struct __copy_cv_<const _Tp>
+{
+    template <class _Up> using __fn = add_const_t<_Up>;
+};
+template <class _Tp>
+struct __copy_cv_<volatile _Tp>
+{
+    template <class _Up> using __fn = add_volatile_t<_Up>;
+};
+template <class _Tp>
+struct __copy_cv_<const volatile _Tp>
+{
+    template <class _Up> using __fn = add_cv_t<_Up>;
+};
+template <class _From, class _To>
+using __copy_cv = typename __copy_cv_<_From>::template __fn<_To>;
+
+// Let XREF(A) denote a unary class [sic] template T such [...]
+// [Note: XREF(A) is __xref<A>::template __fn]
+template <class _Tp>
+struct __xref
+{
+    template <class _Up> using __fn = __copy_cv<_Tp, _Up>;
+};
+template <class _Tp>
+struct __xref<_Tp&>
+{
+    template <class _Up> using __fn = add_lvalue_reference_t<__copy_cv<_Tp, _Up>>;
+};
+template <class _Tp>
+struct __xref<_Tp&&>
+{
+    template <class _Up> using __fn = add_rvalue_reference_t<__copy_cv<_Tp, _Up>>;
+};
+
+template <class _Tp, class _Up,
+    class _Result = __cond_res<__copy_cv<_Tp, _Up>&, __copy_cv<_Up, _Tp>&>,
+    class = enable_if_t<is_lvalue_reference_v<_Result>>>
+using __ll_common_ref = _Result;
+
+template <class _Tp, class _Up>
+using __rr_common_ref = remove_reference_t<__ll_common_ref<_Tp, _Up>>&&;
+
+// Note C: For the common_reference trait applied to a parameter pack [...]
+
+// bullet 1 - sizeof...(T) == 0
+
+template <class...> struct _LIBCPP_TEMPLATE_VIS common_reference {};
+
+template <class... _Types>
+using common_reference_t = typename common_reference<_Types...>::type;
+
+// bullet 2 - sizeof...(T) == 1
+
+template <class _Tp>
+struct _LIBCPP_TEMPLATE_VIS common_reference<_Tp>
+{
+    using type = _Tp;
+};
+
+// bullet 3 - sizeof...(T) == 2
+
+// sub-bullet 4 & 5 - [...] if common_type_t<T1, T2> is well-formed [...]
+//                  - Otherwise, there shall be no member type.
+
+template <class _Tp, class _Up, class = void>
+struct __common_reference4
+    : common_type<_Tp, _Up>
+{};
+
+// sub-bullet 3 - [...] if COND_RES(T1, T2) is well-formed [...]
+
+template <class _Tp, class _Up>
+struct __common_reference4<_Tp, _Up, void_t<__cond_res<_Tp, _Up>>>
+{
+    using type = __cond_res<_Tp, _Up>;
+};
+
+// sub-bullet 2 - [...] if basic_common_reference<[...]>::type is well-formed [...]
+
+template <class _Tp, class _Up>
+using __basic_common_ref = typename basic_common_reference<
+    remove_cvref_t<_Tp>, remove_cvref_t<_Up>,
+    __xref<_Tp>::template __fn, __xref<_Up>::template __fn>::type;
+
+template <class _Tp, class _Up, class = void>
+struct __common_reference3
+    : __common_reference4<_Tp, _Up>
+{};
+
+template <class _Tp, class _Up>
+struct __common_reference3<_Tp, _Up, void_t<__basic_common_ref<_Tp, _Up>>>
+{
+    using type = __basic_common_ref<_Tp, _Up>;
+};
+
+// sub-bullet 1 - If T1 and T2 are reference types and COMMON_REF(T1, T2) is well-formed [...]
+
+template <class _Tp, class _Up, class = void>
+struct __common_reference2
+    : __common_reference3<_Tp, _Up>
+{};
+
+template <class _Tp, class _Up>
+struct __common_reference2<_Tp&, _Up&, void_t<__ll_common_ref<_Tp, _Up>>>
+{
+    using type = __ll_common_ref<_Tp, _Up>;
+};
+
+template <class _Tp, class _Up>
+struct __common_reference2<_Tp&&, _Up&, enable_if_t<
+    is_convertible_v<_Tp&&, __ll_common_ref<const _Tp, _Up>>>>
+{
+    using type = __ll_common_ref<const _Tp, _Up>;
+};
+
+template <class _Tp, class _Up>
+struct __common_reference2<_Tp&, _Up&&, enable_if_t<
+    is_convertible_v<_Up&&, __ll_common_ref<const _Up, _Tp>>>>
+{
+    using type = __ll_common_ref<const _Up, _Tp>;
+};
+
+template <class _Tp, class _Up>
+struct __common_reference2<_Tp&&, _Up&&, enable_if_t<
+    is_convertible_v<_Tp&&, __rr_common_ref<_Tp, _Up>> &&
+    is_convertible_v<_Up&&, __rr_common_ref<_Tp, _Up>>>>
+{
+    using type = __rr_common_ref<_Tp, _Up>;
+};
+
+template <class _Tp, class _Up>
+struct _LIBCPP_TEMPLATE_VIS common_reference<_Tp, _Up>
+    : __common_reference2<_Tp, _Up>
+{};
+
+// bullet 4 - sizeof...(T) > 2
+
+template <class _Void, class _Tp, class _Up, class... _Types>
+struct __fold_common_reference
+{};
+template <class _Tp, class _Up, class... _Types>
+struct __fold_common_reference<void_t<common_reference_t<_Tp, _Up>>, _Tp, _Up, _Types...>
+    : common_reference<common_reference_t<_Tp, _Up>, _Types...>
+{};
+
+template <class _Tp, class _Up, class _Vp, class... _Rest>
+struct _LIBCPP_TEMPLATE_VIS common_reference<_Tp, _Up, _Vp, _Rest...>
+    : __fold_common_reference<void, _Tp, _Up, _Vp, _Rest...>
+{};
+
+#endif // _LIBCPP_STD_VER > 17
+
+#endif // _LIBCPP_HAS_NO_VARIADICS
 
 // is_assignable
 
@@ -4746,12 +4950,7 @@ struct __has_operator_addressof
 
 #endif  // _LIBCPP_CXX03_LANG
 
-#if _LIBCPP_STD_VER > 14
-
-#define __cpp_lib_void_t 201411
-template <class...> using void_t = void;
-
-# ifndef _LIBCPP_HAS_NO_VARIADICS
+#if _LIBCPP_STD_VER > 14 && !defined(_LIBCPP_HAS_NO_VARIADICS)
 template <class... _Args>
 struct conjunction : __and_<_Args...> {};
 template<class... _Args>
@@ -4769,8 +4968,7 @@ struct negation : __not_<_Tp> {};
 template<class _Tp>
 _LIBCPP_INLINE_VAR constexpr bool negation_v
     = negation<_Tp>::value;
-# endif // _LIBCPP_HAS_NO_VARIADICS
-#endif  // _LIBCPP_STD_VER > 14
+#endif  // _LIBCPP_STD_VER > 14 && !defined(_LIBCPP_HAS_NO_VARIADICS)
 
 // These traits are used in __tree and __hash_table
 #ifndef _LIBCPP_CXX03_LANG
