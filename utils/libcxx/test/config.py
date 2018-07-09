@@ -15,6 +15,7 @@ import pipes
 import re
 import shlex
 import shutil
+import string
 import sys
 
 from libcxx.compiler import CXXCompiler
@@ -153,6 +154,7 @@ class Configuration(object):
         self.configure_coverage()
         self.configure_modules()
         self.configure_coroutines()
+        self.configure_concepts()
         self.configure_substitutions()
         self.configure_features()
 
@@ -1014,6 +1016,27 @@ class Configuration(object):
             # reflects a recent value.
             if intMacroValue(macros['__cpp_coroutines']) >= 201703:
                 self.config.available_features.add('fcoroutines-ts')
+
+    def configure_concepts(self):
+        # If the compiler supports concepts, add the 'concepts' feature.
+        macros = self._dump_macros_verbose()
+        flags = []
+        if '__cpp_concepts' not in macros:
+            if self.cxx.hasCompileFlag('-fconcepts'):
+                flags = ['-fconcepts']
+            elif self.cxx.hasCompileFlag(['-Xclang', '-fconcepts-ts']):
+                flags = ['-Xclang', '-fconcepts-ts']
+            if flags: macros = self._dump_macros_verbose(flags=flags)
+        if '__cpp_concepts' in macros:
+            if intMacroValue(macros['__cpp_concepts']) >= 201500:
+                self.config.available_features.add('concepts')
+                self.cxx.compile_flags += flags
+            else:
+                self.lit_config.warning('__cpp_concepts is defined '
+                    'to a silly value: "' + macros['__cpp_concepts'] + '"')
+        elif flags:
+            self.lit_config.warning(string.join(flags, ' ') + ' is supported but '
+                '__cpp_concepts is not defined')
 
     def configure_modules(self):
         modules_flags = ['-fmodules']
