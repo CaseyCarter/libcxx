@@ -153,6 +153,7 @@ class Configuration(object):
         self.configure_coverage()
         self.configure_modules()
         self.configure_coroutines()
+        self.configure_concepts()
         self.configure_substitutions()
         self.configure_features()
 
@@ -1016,6 +1017,22 @@ class Configuration(object):
             # reflects a recent value.
             if intMacroValue(macros['__cpp_coroutines']) >= 201703:
                 self.config.available_features.add('fcoroutines-ts')
+
+    def configure_concepts(self):
+        # If the compiler supports concepts, add the 'concepts' feature.
+        # If it requires the '-fconcepts' flag to do so, additionally add the
+        # 'fconcepts' feature.
+        macros = self._dump_macros_verbose()
+        if '__cpp_concepts' in macros and intMacroValue(macros['__cpp_concepts']) >= 201507:
+            self.config.available_features.add('concepts')
+        elif self.cxx.hasCompileFlag('-fconcepts'):
+            macros = self._dump_macros_verbose(flags=['-fconcepts'])
+            if '__cpp_concepts' not in macros:
+                self.lit_config.warning('-fconcepts is supported but '
+                    '__cpp_concepts is not defined')
+            if intMacroValue(macros['__cpp_concepts']) >= 201507:
+                self.config.available_features.add('concepts')
+                self.config.available_features.add('fconcepts')
 
     def configure_modules(self):
         modules_flags = ['-fmodules']

@@ -494,6 +494,10 @@ namespace std {
 #define _LIBCPP_HAS_IS_FINAL
 #endif
 
+#if defined(__GNUC__) && _GNUC_VER >= 600
+#define _LIBCPP_HAS_IS_SAME_AS
+#endif
+
 #if defined(__GNUC__) && _GNUC_VER >= 403
 #define _LIBCPP_HAS_IS_BASE_OF
 #endif
@@ -1199,6 +1203,18 @@ _LIBCPP_FUNC_VIS extern "C" void __sanitizer_annotate_contiguous_container(
 
 #if !defined(__cpp_coroutines) || __cpp_coroutines < 201703L
 #define _LIBCPP_HAS_NO_COROUTINES
+#endif
+
+// Note that there is no feature test macro for Concepts in the current C++20
+// working draft. Some of the concepts working papers - but notably neither the
+// TS nor the final proposal which was partially merged into the WD - defined
+// __cpp_concepts to 201507L. This is the value that GCC currently defines when
+// support for the concepts TS is enabled with -fconcepts. We therefore use
+// __cpp_concepts to detect support, and speculate that C++20-compliant
+// compilers will define __cpp_concepts to at least 201707 - the date of the
+// Toronto WG21 meeting that incorporated Concepts into the WD.
+#if !defined(__cpp_concepts) || __cpp_concepts < 201507L
+#define _LIBCPP_HAS_NO_CONCEPTS
 #endif
 
 // FIXME: Correct this macro when either (A) a feature test macro for the
