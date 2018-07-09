@@ -2519,6 +2519,19 @@ private:
 
 #endif // _LIBCPP_STD_VER > 14
 
+#if _LIBCPP_STD_VER > 17
+struct identity
+{
+    template <class _Tp>
+    _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
+    _Tp&& operator()(_Tp&& _Val) const _NOEXCEPT {
+        return static_cast<_Tp&&>(_Val);
+    }
+
+    using is_transparent = void;
+};
+#endif // _LIBCPP_STD_VER > 17
+
 _LIBCPP_END_NAMESPACE_STD
 
 #endif  // _LIBCPP_FUNCTIONAL

@@ -45,6 +45,9 @@
 #include <compare>
 #include <complex>
 #include <complex.h>
+#ifndef _LIBCPP_HAS_NO_CONCEPTS
+#include <concepts>
+#endif
 #include <condition_variable>
 #include <csetjmp>
 #include <csignal>

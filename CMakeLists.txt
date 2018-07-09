@@ -529,6 +529,8 @@ add_compile_flags_if_supported(-fvisibility-inlines-hidden)
 if (LIBCXX_CONFIGURE_IDE)
   # This simply allows IDE to process <experimental/coroutine>
   add_compile_flags_if_supported(-fcoroutines-ts)
+  # This (presumably) allows IDE to process <concepts>
+  add_compile_flags_if_supported(-fconcepts)
 endif()
 
 # Let the library headers know they are currently being used to build the

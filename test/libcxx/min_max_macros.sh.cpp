@@ -64,6 +64,8 @@ TEST_MACROS();
 TEST_MACROS();
 #include <complex.h>
 TEST_MACROS();
+#include <concepts>
+TEST_MACROS();
 #include <condition_variable>
 TEST_MACROS();
 #include <csetjmp>

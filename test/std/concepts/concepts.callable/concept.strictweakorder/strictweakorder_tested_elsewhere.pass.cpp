@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-int main()
-{
-}
+// Relation and StrictWeakOrder are syntactically identical, so they are both
+// tested by concepts.relation/relation.pass.cpp
+
+int main() {}

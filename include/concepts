@@ -1,0 +1,404 @@
+// -*- C++ -*-
+//===-------------------------- concepts ----------------------------------===//
+//
+//                     The LLVM Compiler Infrastructure
+//
+// This file is dual licensed under the MIT and the University of Illinois Open
+// Source Licenses. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+
+#ifndef _LIBCPP_CONCEPTS
+#define _LIBCPP_CONCEPTS
+
+/*
+    concepts synopsis
+
+// C++20
+
+namespace std
+{
+
+    // [concepts.lang], language-related concepts
+    // [concept.same], concept Same
+    template<class T, class U>
+      concept Same = see below;
+
+    // [concept.derivedfrom], concept DerivedFrom
+    template<class Derived, class Base>
+      concept DerivedFrom = see below;
+
+    // [concept.convertibleto], concept ConvertibleTo
+    template<class From, class To>
+      concept ConvertibleTo = see below;
+
+    // [concept.commonref], concept CommonReference
+    template<class T, class U>
+      concept CommonReference = see below;
+
+    // [concept.common], concept Common
+    template<class T, class U>
+      concept Common = see below;
+
+    // [concepts.integral], integral concepts
+    template<class T>
+      concept Integral = see below;
+    template<class T>
+      concept SignedIntegral = see below;
+    template<class T>
+      concept UnsignedIntegral = see below;
+
+    // [concept.assignable], concept Assignable
+    template<class LHS, class RHS>
+      concept Assignable = see below;
+
+    // [concept.swappable], concept Swappable
+    template<class T>
+      concept Swappable = see below;
+    template<class T, class U>
+      concept SwappableWith = see below;
+
+    // [concept.destructible], concept Destructible
+    template<class T>
+      concept Destructible = see below;
+
+    // [cooncept.constructible], concept Constructible
+    template<class T, class... Args>
+      concept Constructible = see below;
+
+    // [concept.defaultconstructible], concept DefaultConstructible
+    template<class T>
+      concept DefaultConstructible = see below;
+
+    // [concept.moveconstructible], concept MoveConstructible
+    template<class T>
+      concept MoveConstructible = see below;
+
+    // [concept.copyconstructible], concept CopyConstructible
+    template<class T>
+      concept CopyConstructible = see below;
+
+    // [concepts.compare], comparison concepts
+    // [concept.boolean], concept Boolean
+    template<class B>
+      concept Boolean = see below;
+
+    // [concept.equalitycomparable], concept EqualityComparable
+    template<class T>
+      concept EqualityComparable = see below;
+    template<class T, class U>
+      concept EqualityComparableWith = see below;
+
+    // [concept.stricttotallyordered], concept StrictTotallyOrdered
+    template<class T>
+      concept StrictTotallyOrdered = see below;
+    template<class T, class U>
+      concept StrictTotallyOrderedWith = see below;
+
+    // [concepts.object], object concepts
+    template<class T>
+      concept Movable = see below;
+    template<class T>
+      concept Copyable = see below;
+    template<class T>
+      concept Semiregular = see below;
+    template<class T>
+      concept Regular = see below;
+
+    // [concepts.callable], callable concepts
+    // [concept.invocable], concept Invocable
+    template<class F, class... Args>
+      concept Invocable = see below;
+
+    // [concept.regularinvocable], concept RegularInvocable
+    template<class F, class... Args>
+      concept RegularInvocable = see below;
+
+    // [concept.predicate], concept Predicate
+    template<class F, class... Args>
+      concept Predicate = see below;
+
+    // [concept.relation], concept Relation
+    template<class R, class T, class U>
+      concept Relation = see below;
+
+    // [concept.strictweakorder], concept StrictWeakOrder
+    template<class R, class T, class U>
+      concept StrictWeakOrder = see below;
+
+}
+
+*/
+
+#include <type_traits>
+#include <version>
+
+#if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
+#pragma GCC system_header
+#endif
+
+_LIBCPP_PUSH_MACROS
+#include <__undef_macros>
+
+#if defined(_LIBCPP_HAS_NO_CONCEPTS) || _LIBCPP_STD_VER <= 17
+# if defined(_LIBCPP_WARNING)
+    _LIBCPP_WARNING("<concepts> requires compiler support for concepts and C++2a")
+# else
+#   warning <concepts> requires compiler support for concepts and C++2a
+# endif
+#else // defined(_LIBCPP_HAS_NO_CONCEPTS) || _LIBCPP_STD_VER <= 17
+
+_LIBCPP_BEGIN_NAMESPACE_STD
+
+#ifdef _LIBCPP_HAS_IS_SAME_AS
+template <class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL __same_impl = __is_same_as(_Tp, _Up);
+#else
+template <class, class>
+_LIBCPP_INLINE_VAR _LIBCPP_CONSTEXPR bool __same_impl_ = false;
+template <class _Tp>
+_LIBCPP_INLINE_VAR _LIBCPP_CONSTEXPR bool __same_impl_<_Tp, _Tp> = true;
+template <class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL __same_impl = __same_impl_<_Tp, _Up>;
+#endif // _LIBCPP_HAS_IS_SAME_AS
+
+template <class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL Same = __same_impl<_Tp, _Up> && __same_impl<_Up, _Tp>;
+
+template <class _Derived, class _Base>
+_LIBCPP_CONCEPT_DECL DerivedFrom =
+#ifdef _LIBCPP_HAS_IS_BASE_OF
+    __is_base_of(_Base, _Derived) &&
+#else
+    is_base_of_v<_Base, _Derived> &&
+#endif // _LIBCPP_HAS_IS_BASE_OF
+    is_convertible_v<const volatile _Derived*, const volatile _Base*>;
+
+template <class _From, class _To>
+_LIBCPP_CONCEPT_DECL ConvertibleTo =
+#if __has_feature(is_convertible_to) && !defined(_LIBCPP_USE_IS_CONVERTIBLE_FALLBACK)
+    __is_convertible_to(_From, _To) &&
+#else
+    is_convertible_v<_From, _To> &&
+#endif
+#if 1 // This extension is LWG3151
+    requires { static_cast<_To>(_VSTD::declval<_From>()); };
+#else
+    requires(_From (&_Fn)()) { static_cast<_To>(_Fn()); };
+#endif
+
+template <class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL CommonReference =
+    requires {
+        typename common_reference_t<_Tp, _Up>;
+        typename common_reference_t<_Up, _Tp>;
+    } &&
+    Same<common_reference_t<_Tp, _Up>, common_reference_t<_Up, _Tp>> &&
+    ConvertibleTo<_Tp, common_reference_t<_Tp, _Up>> &&
+    ConvertibleTo<_Up, common_reference_t<_Tp, _Up>>;
+
+template <class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL Common =
+    requires {
+        typename common_type_t<_Tp, _Up>;
+        typename common_type_t<_Up, _Tp>;
+    } &&
+    Same<common_type_t<_Tp, _Up>, common_type_t<_Up, _Tp>> &&
+    ConvertibleTo<_Tp, common_type_t<_Tp, _Up>> &&
+    ConvertibleTo<_Up, common_type_t<_Tp, _Up>> &&
+    CommonReference<
+        add_lvalue_reference_t<const _Tp>,
+        add_lvalue_reference_t<const _Up>> &&
+    CommonReference<
+        add_lvalue_reference_t<common_type_t<_Tp, _Up>>,
+        common_reference_t<
+            add_lvalue_reference_t<const _Tp>,
+            add_lvalue_reference_t<const _Up>>>;
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL Integral = is_integral_v<_Tp>;
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL __integral_has_negatives = _Tp(-1) < _Tp(0);
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL SignedIntegral = Integral<_Tp> && __integral_has_negatives<_Tp>;
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL UnsignedIntegral = Integral<_Tp> && !__integral_has_negatives<_Tp>;
+
+template <class _Lhs, class _Rhs>
+_LIBCPP_CONCEPT_DECL Assignable =
+    is_lvalue_reference_v<_Lhs> &&
+    CommonReference<
+        const remove_reference_t<_Lhs>&,
+        const remove_reference_t<_Rhs>&> &&
+    requires(_Lhs __left, _Rhs&& __right) {
+        __left = static_cast<_Rhs&&>(__right);
+        requires Same<_Lhs, decltype(__left = static_cast<_Rhs&&>(__right))>;
+    };
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL Swappable = is_swappable_v<_Tp>;
+
+template <class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL SwappableWith =
+    is_swappable_with_v<_Tp, _Tp> && is_swappable_with_v<_Up, _Up> &&
+    CommonReference<const remove_reference_t<_Tp>&, const remove_reference_t<_Up>&> &&
+    is_swappable_with_v<_Tp, _Up> && is_swappable_with_v<_Up, _Tp>;
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL Destructible = is_nothrow_destructible_v<_Tp>;
+
+template <class _Tp, class... _Args>
+_LIBCPP_CONCEPT_DECL Constructible =
+    Destructible<_Tp> && is_constructible_v<_Tp, _Args...>;
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL DefaultConstructible = Constructible<_Tp>;
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL MoveConstructible =
+    Constructible<_Tp, _Tp> && ConvertibleTo<_Tp, _Tp>;
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL CopyConstructible =
+    MoveConstructible<_Tp> &&
+    Constructible<_Tp, _Tp&> && ConvertibleTo<_Tp&, _Tp> &&
+    Constructible<_Tp, const _Tp&> && ConvertibleTo<const _Tp&, _Tp> &&
+    Constructible<_Tp, const _Tp> && ConvertibleTo<const _Tp, _Tp>;
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL Movable =
+    is_object_v<_Tp> &&
+    MoveConstructible<_Tp> &&
+    Assignable<_Tp&, _Tp> &&
+    Swappable<_Tp>;
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL Boolean =
+    Movable<remove_cvref_t<_Tp>> &&
+    requires(const remove_reference_t<_Tp>& __t1,
+             const remove_reference_t<_Tp>& __t2, const bool __b) {
+        requires ConvertibleTo<const remove_reference_t<_Tp>&, bool>;
+        !__t1;        requires ConvertibleTo<decltype(!__t1), bool>;
+        __t1 && __t2; requires Same<decltype(__t1 && __t2), bool>;
+        __t1 &&  __b; requires Same<decltype(__t1 &&  __b), bool>;
+         __b && __t2; requires Same<decltype( __b && __t2), bool>;
+        __t1 || __t2; requires Same<decltype(__t1 || __t2), bool>;
+        __t1 ||  __b; requires Same<decltype(__t1 ||  __b), bool>;
+         __b || __t2; requires Same<decltype( __b || __t2), bool>;
+        __t1 == __t2; requires ConvertibleTo<decltype(__t1 == __t2), bool>;
+        __t1 ==  __b; requires ConvertibleTo<decltype(__t1 ==  __b), bool>;
+         __b == __t2; requires ConvertibleTo<decltype( __b == __t2), bool>;
+        __t1 != __t2; requires ConvertibleTo<decltype(__t1 != __t2), bool>;
+        __t1 !=  __b; requires ConvertibleTo<decltype(__t1 !=  __b), bool>;
+         __b != __t2; requires ConvertibleTo<decltype( __b != __t2), bool>;
+    };
+
+template <class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL __weakly_equality_comparable =
+    requires(const remove_reference_t<_Tp>& __t,
+             const remove_reference_t<_Up>& __u) {
+        __t == __u; requires Boolean<decltype(__t == __u)>;
+        __t != __u; requires Boolean<decltype(__t != __u)>;
+        __u == __t; requires Boolean<decltype(__u == __t)>;
+        __u != __t; requires Boolean<decltype(__u != __t)>;
+    };
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL EqualityComparable = __weakly_equality_comparable<_Tp, _Tp>;
+
+template <class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL EqualityComparableWith =
+    EqualityComparable<_Tp> &&
+    EqualityComparable<_Up> &&
+    CommonReference<
+        const remove_reference_t<_Tp>&,
+        const remove_reference_t<_Up>&> &&
+    EqualityComparable<
+        common_reference_t<
+            const remove_reference_t<_Tp>&,
+            const remove_reference_t<_Up>&>> &&
+    __weakly_equality_comparable<_Tp, _Up>;
+
+template <class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL __totally_ordered =
+    requires(const remove_reference_t<_Tp>& __t,
+             const remove_reference_t<_Up>& __u) {
+        __t <  __u; requires Boolean<decltype(__t <  __u)>;
+        __t >  __u; requires Boolean<decltype(__t >  __u)>;
+        __t <= __u; requires Boolean<decltype(__t <= __u)>;
+        __t >= __u; requires Boolean<decltype(__t >= __u)>;
+    };
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL StrictTotallyOrdered =
+    EqualityComparable<_Tp> && __totally_ordered<_Tp, _Tp>;
+
+template <class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL StrictTotallyOrderedWith =
+    StrictTotallyOrdered<_Tp> &&
+    StrictTotallyOrdered<_Up> &&
+    CommonReference<
+        const remove_reference_t<_Tp>&,
+        const remove_reference_t<_Up>&> &&
+    StrictTotallyOrdered<
+        common_reference_t<
+            const remove_reference_t<_Tp>&,
+            const remove_reference_t<_Up>&>> &&
+    EqualityComparableWith<_Tp, _Up> &&
+    __totally_ordered<_Tp, _Up> &&
+    __totally_ordered<_Up, _Tp>;
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL Copyable =
+    CopyConstructible<_Tp> &&
+    Movable<_Tp> &&
+    Assignable<_Tp&, const _Tp&>;
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL Semiregular = Copyable<_Tp> && DefaultConstructible<_Tp>;
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL Regular = Semiregular<_Tp> && EqualityComparable<_Tp>;
+
+template <class _Fn, class... _Args>
+_LIBCPP_CONCEPT_DECL Invocable = requires(_Fn&& __fn, _Args&&... __args) {
+    _VSTD::__invoke_constexpr(static_cast<_Fn&&>(__fn), static_cast<_Args&&>(__args)...);
+};
+
+template <class _Fn, class... _Args>
+_LIBCPP_CONCEPT_DECL RegularInvocable = Invocable<_Fn, _Args...>;
+
+template <class _Fn, class... _Args>
+_LIBCPP_CONCEPT_DECL Predicate = RegularInvocable<_Fn, _Args...> &&
+    Boolean<invoke_result_t<_Fn, _Args...>>;
+
+template <class _Fn, class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL Relation =
+    Predicate<_Fn, _Tp, _Tp> &&
+    Predicate<_Fn, _Up, _Up> &&
+    CommonReference<
+        const remove_reference_t<_Tp>&,
+        const remove_reference_t<_Up>&> &&
+    Predicate<_Fn,
+        common_reference_t<
+            const remove_reference_t<_Tp>&,
+            const remove_reference_t<_Up>&>,
+        common_reference_t<
+            const remove_reference_t<_Tp>&,
+            const remove_reference_t<_Up>&>> &&
+    Predicate<_Fn, _Tp, _Up> &&
+    Predicate<_Fn, _Up, _Tp>;
+
+template <class _Fn, class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL StrictWeakOrder = Relation<_Fn, _Tp, _Up>;
+
+_LIBCPP_END_NAMESPACE_STD
+
+#endif  // defined(_LIBCPP_HAS_NO_CONCEPTS) || _LIBCPP_STD_VER <= 17
+
+_LIBCPP_POP_MACROS
+
+#endif  // _LIBCPP_CONCEPTS
