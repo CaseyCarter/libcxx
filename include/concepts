@@ -130,8 +130,8 @@ namespace std
 
 */
 
-#include <__config>
 #include <type_traits>
+#include <version>
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #pragma GCC system_header
@@ -149,8 +149,6 @@ _LIBCPP_PUSH_MACROS
 #endif
 
 #if !defined(_LIBCPP_HAS_NO_CONCEPTS) && _LIBCPP_STD_VER > 17
-#define __cpp_lib_concepts 201806L
-
 #if __cpp_concepts < 201707L
 #define _LIBCPP_CONCEPT_DECL concept bool
 #else
@@ -407,8 +405,6 @@ template <class _Fn, class _Tp, class _Up>
 _LIBCPP_CONCEPT_DECL StrictWeakOrder = Relation<_Fn, _Tp, _Up>;
 
 _LIBCPP_END_NAMESPACE_STD
-
-#undef _LIBCPP_CONCEPT_DECL
 
 #endif  // !defined(_LIBCPP_HAS_NO_CONCEPTS) && _LIBCPP_STD_VER > 17
 

@@ -11,9 +11,6 @@
 // UNSUPPORTED: c++98, c++03, c++11, c++14, c++17
 
 #include <concepts>
-#include <type_traits>
-
-#include "test_macros.h"
 
 template <class Derived, class Base>
 void test_derived_from() {

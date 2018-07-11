@@ -22,4 +22,8 @@
 #pragma GCC system_header
 #endif
 
+#if !defined(_LIBCPP_HAS_NO_CONCEPTS) && _LIBCPP_STD_VER > 17
+#define __cpp_lib_concepts 201806L
+#endif
+
 #endif  // _LIBCPP_VERSIONH
