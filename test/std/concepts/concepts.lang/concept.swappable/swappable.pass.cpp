@@ -29,13 +29,13 @@ struct B {
 namespace MyNS {
     // Make the test types non-copyable so that generic std::swap is not valid.
     struct A {
-    A(A const&) = delete;
-    A& operator=(A const&) = delete;
+        A(A const&) = delete;
+        A& operator=(A const&) = delete;
     };
 
     struct B {
-    B(B const&) = delete;
-    B& operator=(B const&) = delete;
+        B(B const&) = delete;
+        B& operator=(B const&) = delete;
     };
 
     struct C {};
@@ -50,14 +50,14 @@ namespace MyNS {
     void swap(D&, C&) {}
 
     struct M {
-    M(M const&) = delete;
-    M& operator=(M const&) = delete;
+        M(M const&) = delete;
+        M& operator=(M const&) = delete;
     };
 
     void swap(M&&, M&&) {}
 
     struct DeletedSwap {
-    friend void swap(DeletedSwap&, DeletedSwap&) = delete;
+        friend void swap(DeletedSwap&, DeletedSwap&) = delete;
     };
 } // namespace MyNS
 
@@ -106,10 +106,18 @@ int main() {
     }
     {
         // test that a deleted swap is correctly handled.
+#ifdef _LIBCPP_HAS_RANGES
+        test_swappable<MyNS::DeletedSwap>();
+#else
         test_not_swappable<MyNS::DeletedSwap>();
+#endif
     }
     {
         // test that a swap with ambiguous overloads is handled correctly.
+#ifdef _LIBCPP_HAS_RANGES
+        test_swappable<MyNS2::AmbiguousSwap>();
+#else
         test_not_swappable<MyNS2::AmbiguousSwap>();
+#endif
     }
 }

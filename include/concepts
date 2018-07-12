@@ -242,15 +242,6 @@ _LIBCPP_CONCEPT_DECL Assignable =
     };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL Swappable = is_swappable_v<_Tp>;
-
-template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL SwappableWith =
-    is_swappable_with_v<_Tp, _Tp> && is_swappable_with_v<_Up, _Up> &&
-    CommonReference<const remove_reference_t<_Tp>&, const remove_reference_t<_Up>&> &&
-    is_swappable_with_v<_Tp, _Up> && is_swappable_with_v<_Up, _Tp>;
-
-template <class _Tp>
 _LIBCPP_CONCEPT_DECL Destructible = is_nothrow_destructible_v<_Tp>;
 
 template <class _Tp, class... _Args>
@@ -263,6 +254,89 @@ _LIBCPP_CONCEPT_DECL DefaultConstructible = Constructible<_Tp>;
 template <class _Tp>
 _LIBCPP_CONCEPT_DECL MoveConstructible =
     Constructible<_Tp, _Tp> && ConvertibleTo<_Tp, _Tp>;
+
+template <class _Fn, class... _Args>
+_LIBCPP_CONCEPT_DECL Invocable = requires(_Fn&& __fn, _Args&&... __args) {
+    _VSTD::__invoke_constexpr(static_cast<_Fn&&>(__fn), static_cast<_Args&&>(__args)...);
+};
+
+#ifdef _LIBCPP_HAS_RANGES
+namespace ranges
+{
+    namespace __swap
+    {
+        template <class _Tp>
+        void swap(_Tp&, _Tp&) = delete;
+        template <class _Tp, size_t _Size>
+        void swap(_Tp(&)[_Size], _Tp(&)[_Size]) = delete;
+
+        template <class _Tp, class _Up>
+        _LIBCPP_CONCEPT_DECL __has_adl = requires(_Tp&& __t, _Up&& __u) {
+            swap(static_cast<_Tp&&>(__t), static_cast<_Up&&>(__u));
+        };
+
+        struct __fn
+        {
+            template <class _Tp, class _Up>
+            requires __has_adl<_Tp, _Up>
+            constexpr void operator()(_Tp&& __t, _Up&& __u) const
+                _NOEXCEPT_(_NOEXCEPT_(swap(static_cast<_Tp&&>(__t), static_cast<_Up&&>(__u))))
+            {
+                swap(static_cast<_Tp&&>(__t), static_cast<_Up&&>(__u));
+            }
+
+            template <class _Tp>
+            requires !__has_adl<_Tp&> && MoveConstructible<_Tp> &&
+                Assignable<_Tp&, _Tp>
+            constexpr void operator()(_Tp& __x, _Tp& __y) const
+                _NOEXCEPT_(is_nothrow_move_constructible_v<_Tp> &&
+                    is_nothrow_move_assignable_v<_Tp>)
+            {
+                _Tp __tmp{static_cast<_Tp&&>(__x)};
+                __y = static_cast<_Tp&&>(__x);
+                __x = static_cast<_Tp&&>(__y);
+            }
+
+            template <class _Tp, class _Up, size_t _Size, class _Fn = __fn>
+            requires !__has_adl<_Tp(&)[_Size], _Up(&)[_Size]> &&
+                Invocable<const _Fn&, _Tp&, _Up&>
+            constexpr void operator()(_Tp(&__t)[_Size], _Up(&__u)[_Size]) const
+                _NOEXCEPT_(_NOEXCEPT_(_VSTD::declval<const _Fn&>()(*__t, *__u)))
+            {
+                for (size_t __i = 0; __i < _Size; ++__i) {
+                    (*this)(__t[__i], __u[__i]);
+                }
+            }
+        };
+    }
+    _LIBCPP_INLINE_VAR _LIBCPP_CONSTEXPR __swap::__fn swap{};
+}
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL Swappable = requires(_Tp& __t, _Tp& __u) {
+    _VSTD::ranges::swap(__t, __u);
+};
+
+template <class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL SwappableWith =
+    CommonReference<const remove_reference_t<_Tp>&, const remove_reference_t<_Up>&> &&
+    requires(_Tp&& __t, _Up&& __u) {
+        _VSTD::ranges::swap(static_cast<_Tp&&>(__t), static_cast<_Tp&&>(__t));
+        _VSTD::ranges::swap(static_cast<_Up&&>(__u), static_cast<_Up&&>(__u));
+        _VSTD::ranges::swap(static_cast<_Tp&&>(__t), static_cast<_Up&&>(__u));
+        _VSTD::ranges::swap(static_cast<_Up&&>(__u), static_cast<_Tp&&>(__t));
+    };
+
+#else // ^^^ Ranges / !Ranges vvv
+
+template <class _Tp>
+_LIBCPP_CONCEPT_DECL Swappable = is_swappable_v<_Tp>;
+
+template <class _Tp, class _Up>
+_LIBCPP_CONCEPT_DECL SwappableWith =
+    is_swappable_with_v<_Tp, _Tp> && is_swappable_with_v<_Up, _Up> &&
+    CommonReference<const remove_reference_t<_Tp>&, const remove_reference_t<_Up>&> &&
+    is_swappable_with_v<_Tp, _Up> && is_swappable_with_v<_Up, _Tp>;
+#endif // _LIBCPP_HAS_RANGES
 
 template <class _Tp>
 _LIBCPP_CONCEPT_DECL CopyConstructible =
@@ -365,11 +439,6 @@ _LIBCPP_CONCEPT_DECL Semiregular = Copyable<_Tp> && DefaultConstructible<_Tp>;
 
 template <class _Tp>
 _LIBCPP_CONCEPT_DECL Regular = Semiregular<_Tp> && EqualityComparable<_Tp>;
-
-template <class _Fn, class... _Args>
-_LIBCPP_CONCEPT_DECL Invocable = requires(_Fn&& __fn, _Args&&... __args) {
-    _VSTD::__invoke_constexpr(static_cast<_Fn&&>(__fn), static_cast<_Args&&>(__args)...);
-};
 
 template <class _Fn, class... _Args>
 _LIBCPP_CONCEPT_DECL RegularInvocable = Invocable<_Fn, _Args...>;
