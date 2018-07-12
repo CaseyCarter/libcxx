@@ -1309,6 +1309,9 @@ _LIBCPP_FUNC_VIS extern "C" void __sanitizer_annotate_contiguous_container(
 # else
 #  define _LIBCPP_CONCEPT_DECL concept
 # endif //  __cpp_concepts < 201707L
+# if _LIBCPP_STD_VER > 17
+#  define _LIBCPP_HAS_RANGES
+# endif
 #endif
 
 // FIXME: Correct this macro when either (A) a feature test macro for the

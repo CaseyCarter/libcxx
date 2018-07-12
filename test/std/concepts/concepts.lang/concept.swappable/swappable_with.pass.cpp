@@ -104,13 +104,11 @@ void test_not_swappable_with() {
 namespace example {
     template<class T, std::SwappableWith<T> U>
     void value_swap(T&& t, U&& u) {
-        using std::swap;
-        swap(std::forward<T>(t), std::forward<U>(u));
+        ranges::swap(std::forward<T>(t), std::forward<U>(u));
     }
     template<std::Swappable T>
     void lv_swap(T& t1, T& t2) {
-        using std::swap;
-        swap(t1, t2);
+        ranges::swap(t1, t2);
     }
      namespace N {
         struct A { int m; };
@@ -118,12 +116,10 @@ namespace example {
             A* a;
             Proxy(A& a) : a{&a} {}
             friend void swap(Proxy&& x, Proxy&& y) {
-                using std::swap;
-                swap(x.a, y.a);
+                ranges::swap(x.a, y.a);
             }
             friend void swap(A& x, Proxy p) {
-                using std::swap;
-                swap(x.m, p.a->m);
+                ranges::swap(x.m, p.a->m);
             }
             friend void swap(Proxy p, A& x) { swap(x, p); }
         };

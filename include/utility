@@ -206,6 +206,10 @@ template <size_t I>
 #include <version>
 #include <__debug>
 
+#ifdef _LIBCPP_HAS_RANGES
+#include <concepts>
+#endif
+
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #pragma GCC system_header
 #endif
