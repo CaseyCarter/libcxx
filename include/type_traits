@@ -1467,6 +1467,8 @@ _LIBCPP_INLINE_VAR _LIBCPP_CONSTEXPR bool is_base_of_v
 
 // is_convertible
 
+template <class _Tp> _Tp  __test_convert(_Tp) _NOEXCEPT;
+
 #if __has_feature(is_convertible_to) && !defined(_LIBCPP_USE_IS_CONVERTIBLE_FALLBACK)
 
 template <class _T1, class _T2> struct _LIBCPP_TEMPLATE_VIS is_convertible
@@ -1477,14 +1479,12 @@ template <class _T1, class _T2> struct _LIBCPP_TEMPLATE_VIS is_convertible
 
 namespace __is_convertible_imp
 {
-template <class _Tp> void  __test_convert(_Tp);
-
 template <class _From, class _To, class = void>
 struct __is_convertible_test : public false_type {};
 
 template <class _From, class _To>
 struct __is_convertible_test<_From, _To,
-    decltype(_VSTD::__is_convertible_imp::__test_convert<_To>(_VSTD::declval<_From>()))> : public true_type
+    decltype((void)_VSTD::__test_convert<_To>(_VSTD::declval<_From>()))> : public true_type
 {};
 
 template <class _Tp, bool _IsArray =    is_array<_Tp>::value,
@@ -2210,42 +2210,42 @@ struct _LIBCPP_TEMPLATE_VIS basic_common_reference
 template <class _Tp>
 struct __copy_cv_
 {
-    template <class _Up> using __fn = _Up;
+    template <class _Up> using __apply = _Up;
 };
 template <class _Tp>
 struct __copy_cv_<const _Tp>
 {
-    template <class _Up> using __fn = add_const_t<_Up>;
+    template <class _Up> using __apply = add_const_t<_Up>;
 };
 template <class _Tp>
 struct __copy_cv_<volatile _Tp>
 {
-    template <class _Up> using __fn = add_volatile_t<_Up>;
+    template <class _Up> using __apply = add_volatile_t<_Up>;
 };
 template <class _Tp>
 struct __copy_cv_<const volatile _Tp>
 {
-    template <class _Up> using __fn = add_cv_t<_Up>;
+    template <class _Up> using __apply = add_cv_t<_Up>;
 };
 template <class _From, class _To>
-using __copy_cv = typename __copy_cv_<_From>::template __fn<_To>;
+using __copy_cv = typename __copy_cv_<_From>::template __apply<_To>;
 
 // Let XREF(A) denote a unary class [sic] template T such [...]
-// [Note: XREF(A) is __xref<A>::template __fn]
+// [Note: XREF(A) is __xref<A>::template __apply]
 template <class _Tp>
 struct __xref
 {
-    template <class _Up> using __fn = __copy_cv<_Tp, _Up>;
+    template <class _Up> using __apply = __copy_cv<_Tp, _Up>;
 };
 template <class _Tp>
 struct __xref<_Tp&>
 {
-    template <class _Up> using __fn = add_lvalue_reference_t<__copy_cv<_Tp, _Up>>;
+    template <class _Up> using __apply = add_lvalue_reference_t<__copy_cv<_Tp, _Up>>;
 };
 template <class _Tp>
 struct __xref<_Tp&&>
 {
-    template <class _Up> using __fn = add_rvalue_reference_t<__copy_cv<_Tp, _Up>>;
+    template <class _Up> using __apply = add_rvalue_reference_t<__copy_cv<_Tp, _Up>>;
 };
 
 template <class _Tp, class _Up,
@@ -2296,7 +2296,7 @@ struct __common_reference4<_Tp, _Up, void_t<__cond_res<_Tp, _Up>>>
 template <class _Tp, class _Up>
 using __basic_common_ref = typename basic_common_reference<
     remove_cvref_t<_Tp>, remove_cvref_t<_Up>,
-    __xref<_Tp>::template __fn, __xref<_Up>::template __fn>::type;
+    __xref<_Tp>::template __apply, __xref<_Up>::template __apply>::type;
 
 template <class _Tp, class _Up, class = void>
 struct __common_reference3
@@ -2581,7 +2581,7 @@ inline _LIBCPP_INLINE_VISIBILITY
 typename decay<_Tp>::type
 __decay_copy(const _Tp& __t)
 {
-    return _VSTD::forward<_Tp>(__t);
+    return __t;
 }
 
 #endif

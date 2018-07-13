@@ -32,8 +32,6 @@ public:
     G(const G& g) : alive_(g.alive_) {++n_alive;}
     ~G() {alive_ = 0; --n_alive;}
 
-
-
     void operator()(int i, double j)
     {
         assert(alive_ == 1);
