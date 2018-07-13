@@ -286,7 +286,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_adl<_Tp&> && MoveConstructible<_Tp> &&
+            requires !__has_adl<_Tp&, _Tp&> && MoveConstructible<_Tp> &&
                 Assignable<_Tp&, _Tp>
             constexpr void operator()(_Tp& __x, _Tp& __y) const
                 _NOEXCEPT_(is_nothrow_move_constructible_v<_Tp> &&

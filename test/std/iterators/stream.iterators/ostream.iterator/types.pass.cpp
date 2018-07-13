@@ -34,13 +34,18 @@ int main()
 #else
     static_assert((std::is_same<I1::iterator_category, std::output_iterator_tag>::value), "");
     static_assert((std::is_same<I1::value_type, void>::value), "");
+#ifdef _LIBCPP_HAS_RANGES
+    static_assert((std::is_same<I1::difference_type, std::ptrdiff_t>::value), "");
+#else // _LIBCPP_HAS_RANGES
     static_assert((std::is_same<I1::difference_type, void>::value), "");
+#endif // _LIBCPP_HAS_RANGES
     static_assert((std::is_same<I1::pointer, void>::value), "");
     static_assert((std::is_same<I1::reference, void>::value), "");
 #endif
     static_assert((std::is_same<I1::char_type, char>::value), "");
     static_assert((std::is_same<I1::traits_type, std::char_traits<char> >::value), "");
     static_assert((std::is_same<I1::ostream_type, std::ostream>::value), "");
+
     typedef std::ostream_iterator<unsigned, wchar_t> I2;
 #if TEST_STD_VER <= 14
     static_assert((std::is_convertible<I2,
@@ -48,7 +53,11 @@ int main()
 #else
     static_assert((std::is_same<I2::iterator_category, std::output_iterator_tag>::value), "");
     static_assert((std::is_same<I2::value_type, void>::value), "");
+#ifdef _LIBCPP_HAS_RANGES
+    static_assert((std::is_same<I2::difference_type, std::ptrdiff_t>::value), "");
+#else // _LIBCPP_HAS_RANGES
     static_assert((std::is_same<I2::difference_type, void>::value), "");
+#endif // _LIBCPP_HAS_RANGES
     static_assert((std::is_same<I2::pointer, void>::value), "");
     static_assert((std::is_same<I2::reference, void>::value), "");
 #endif

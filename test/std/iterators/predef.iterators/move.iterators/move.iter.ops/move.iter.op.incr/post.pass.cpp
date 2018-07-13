@@ -26,9 +26,17 @@ void
 test(It i, It x)
 {
     std::move_iterator<It> r(i);
-    std::move_iterator<It> rr = r++;
+#ifdef _LIBCPP_HAS_RANGES
+    if constexpr (std::ForwardIterator<It>) {
+#endif
+        std::move_iterator<It> rr = r++;
+        assert(rr.base() == i);
+#ifdef _LIBCPP_HAS_RANGES
+    } else {
+        r++;
+    }
+#endif
     assert(r.base() == x);
-    assert(rr.base() == i);
 }
 
 int main()

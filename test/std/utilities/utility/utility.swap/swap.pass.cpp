@@ -41,14 +41,22 @@ struct NoexceptMoveOnly {
 
 struct NotMoveConstructible {
     NotMoveConstructible& operator=(NotMoveConstructible&&) { return *this; }
+#if defined(__GNUC__) && !defined(__clang__) && defined(__cpp_concepts) // FIXME: write a bug test
+    NotMoveConstructible(NotMoveConstructible&&) = delete;
+#else
 private:
     NotMoveConstructible(NotMoveConstructible&&);
+#endif
 };
 
 struct NotMoveAssignable {
     NotMoveAssignable(NotMoveAssignable&&);
+#if defined(__GNUC__) && !defined(__clang__) && defined(__cpp_concepts) // FIXME: write a bug test
+    NotMoveAssignable& operator=(NotMoveAssignable&&) = delete;
+#else
 private:
     NotMoveAssignable& operator=(NotMoveAssignable&&);
+#endif
 };
 
 template <class Tp>
