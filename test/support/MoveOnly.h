@@ -19,8 +19,11 @@
 
 class MoveOnly
 {
+#if defined(_LIBCPP_HAS_NO_CONCEPTS) || defined(__clang__) || !defined(__GNUC__)
+    // Avoid triggering https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67225.
     MoveOnly(const MoveOnly&);
     MoveOnly& operator=(const MoveOnly&);
+#endif
 
     int data_;
 public:

@@ -41,8 +41,7 @@ struct NonSwappableDeleter {
   NonSwappableDeleter& operator=(NonSwappableDeleter const&) { return *this; }
   void operator()(T*) const {}
 private:
-  NonSwappableDeleter(NonSwappableDeleter const&);
-
+  NonSwappableDeleter(NonSwappableDeleter const&) _LIBCPP_EQUAL_DELETE;
 };
 
 int main()

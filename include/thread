@@ -286,8 +286,8 @@ class _LIBCPP_TYPE_VIS thread
 {
     __libcpp_thread_t __t_;
 
-    thread(const thread&);
-    thread& operator=(const thread&);
+    thread(const thread&) _LIBCPP_EQUAL_DELETE;
+    thread& operator=(const thread&) _LIBCPP_EQUAL_DELETE;
 public:
     typedef __thread_id id;
     typedef __libcpp_thread_t native_handle_type;

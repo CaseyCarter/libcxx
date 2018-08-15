@@ -23,7 +23,7 @@ struct Hash {
 
     Hash () {}
 private:
-    Hash (const Hash &); // declared but not defined
+    Hash (const Hash &) _LIBCPP_EQUAL_DELETE;
 };
 
 

@@ -20,7 +20,12 @@ struct Comp {
 
     Comp () {}
 private:
+#if !defined(__clang__) && defined(__cpp_concepts) && defined(__GNUC__)
+    // Avoid triggering https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67225.
+    Comp (const Comp &) = delete;
+#else
     Comp (const Comp &); // declared but not defined
+#endif
     };
 
 

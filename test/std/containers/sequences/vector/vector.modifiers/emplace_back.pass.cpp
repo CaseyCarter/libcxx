@@ -27,8 +27,14 @@ class A
     int i_;
     double d_;
 
+#if defined(__clang__) || !(defined(__cpp_concepts) && defined(__GNUC__))
     A(const A&);
     A& operator=(const A&);
+#else
+    // Avoid triggering https://gcc.gnu.org/bugzilla/shobug.cgi?id=67225.
+    A(const A&) = delete;
+    A& operator=(const A&) = delete;
+#endif
 public:
     A(int i, double d)
         : i_(i), d_(d) {}

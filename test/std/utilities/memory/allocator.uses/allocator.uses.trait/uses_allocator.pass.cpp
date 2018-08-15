@@ -58,7 +58,10 @@ int main()
     test<false, C, decltype(C::allocator_type)>();
     test<false, D, decltype(D::allocator_type)>();
 #if TEST_STD_VER >= 11
+#if defined(__clang__) || !(defined(__cpp_concepts) && defined(__GNUC__))
+    // Avoid triggering https://gcc.gnu.org/bugzilla/shobug.cgi?id=67225.
     test<false, E, int>();
+#endif
 #endif
 
 

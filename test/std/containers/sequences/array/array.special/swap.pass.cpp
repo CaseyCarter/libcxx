@@ -22,8 +22,14 @@
 struct NonSwappable {
   NonSwappable() {}
 private:
+#if defined(__clang__) || !(defined(__cpp_concepts) && defined(__GNUC__))
   NonSwappable(NonSwappable const&);
   NonSwappable& operator=(NonSwappable const&);
+#else
+  // Avoid triggering https://gcc.gnu.org/bugzilla/shobug.cgi?id=67225.
+  NonSwappable(NonSwappable const&) = delete;
+  NonSwappable& operator=(NonSwappable const&) = delete;
+#endif
 };
 
 template <class Tp>

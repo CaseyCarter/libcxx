@@ -62,6 +62,9 @@ int main()
     static_assert((std::is_same<std::allocator_traits<B<char> >::const_pointer, const char*>::value), "");
     static_assert((std::is_same<std::allocator_traits<C<char> >::const_pointer, CPtr<const char> >::value), "");
 #if TEST_STD_VER >= 11
+#if defined(__clang__) || !(defined(__cpp_concepts) && defined(__GNUC__))
+    // Avoid triggering https://gcc.gnu.org/bugzilla/shobug.cgi?id=67225.
     static_assert((std::is_same<std::allocator_traits<D<char> >::const_pointer, const char*>::value), "");
+#endif
 #endif
 }

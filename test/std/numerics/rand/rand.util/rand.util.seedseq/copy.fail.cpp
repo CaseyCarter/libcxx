@@ -6,6 +6,8 @@
 // Source Licenses. See LICENSE.TXT for details.
 //
 //===----------------------------------------------------------------------===//
+// This test is expected to fail due to https://gcc.gnu.org/bugzilla/shobug.cgi?id=67225.
+// REQUIRES: !gcc || !concepts
 
 // <random>
 

@@ -386,7 +386,7 @@ public:
     _LIBCPP_INLINE_VISIBILITY reference_wrapper(type& __f) _NOEXCEPT
         : __f_(_VSTD::addressof(__f)) {}
 #ifndef _LIBCPP_CXX03_LANG
-    private: reference_wrapper(type&&); public: // = delete; // do not bind to temps
+    private: reference_wrapper(type&&) _LIBCPP_EQUAL_DELETE; public: // do not bind to temps
 #endif
 
     // access

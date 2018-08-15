@@ -31,7 +31,10 @@
 
 int main()
 {
+    // Avoid triggering https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67225.
+#if defined(__clang__) || !(defined(__cpp_concepts) && defined(__GNUC__))
     typedef std::multimap<int, double, transparent_less_private> M;
+#endif
 
     TEST_IGNORE_NODISCARD M().count(C2Int{5});
 }

@@ -45,8 +45,11 @@ void test_basic() {
   }
 #if TEST_STD_VER >= 11
   {
+#if defined(__clang__) || !(defined(__cpp_concepts) && defined(__GNUC__))
+    // Avoid triggering https://gcc.gnu.org/bugzilla/shobug.cgi?id=67225.
     typedef std::unique_ptr<VT, D2> P;
     static_assert(std::is_same<typename P::pointer, int*>::value, "");
+#endif
   }
   {
     typedef std::unique_ptr<VT, D3> P;

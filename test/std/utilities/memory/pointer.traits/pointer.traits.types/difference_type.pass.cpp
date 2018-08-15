@@ -61,6 +61,9 @@ int main()
     static_assert((std::is_same<std::pointer_traits<D<int> >::difference_type, char>::value), "");
     static_assert((std::is_same<std::pointer_traits<E<int> >::difference_type, std::ptrdiff_t>::value), "");
 #if TEST_STD_VER >= 11
+#if defined(__clang__) || !(defined(__cpp_concepts) && defined(__GNUC__))
+    // Avoid triggering https://gcc.gnu.org/bugzilla/shobug.cgi?id=67225.
     static_assert((std::is_same<std::pointer_traits<F<int>>::difference_type, std::ptrdiff_t>::value), "");
+#endif
 #endif
 }
