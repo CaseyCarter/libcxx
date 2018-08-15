@@ -73,6 +73,9 @@ int main()
     static_assert((std::is_same<std::allocator_traits<B<char> >::difference_type, std::ptrdiff_t>::value), "");
     static_assert((std::is_same<std::allocator_traits<C<char> >::difference_type, signed char>::value), "");
 #if TEST_STD_VER >= 11
+#if defined(__clang__) || !(defined(__cpp_concepts) && defined(__GNUC__))
+    // Avoid triggering https://gcc.gnu.org/bugzilla/shobug.cgi?id=67225.
     static_assert((std::is_same<std::allocator_traits<D<char> >::difference_type, std::ptrdiff_t>::value), "");
+#endif
 #endif
 }

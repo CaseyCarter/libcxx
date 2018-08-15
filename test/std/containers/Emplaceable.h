@@ -17,8 +17,14 @@
 
 class Emplaceable
 {
+#if defined(__clang__) || !(defined(__cpp_concepts) && defined(__GNUC__))
     Emplaceable(const Emplaceable&);
     Emplaceable& operator=(const Emplaceable&);
+#else
+    // Avoid triggering https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67225.
+    Emplaceable(const Emplaceable&) = delete;
+    Emplaceable& operator=(const Emplaceable&) = delete;
+#endif
 
     int int_;
     double double_;

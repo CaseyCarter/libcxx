@@ -10,6 +10,8 @@
 // These constructors are still unavailable in C++03, but this test depends
 // on access control SFINAE and fails without it.
 // UNSUPPORTED: c++98, c++03
+// This test is expected to fail due to https://gcc.gnu.org/bugzilla/shobug.cgi?id=67225.
+// REQUIRES: !gcc || !concepts
 
 // <locale>
 

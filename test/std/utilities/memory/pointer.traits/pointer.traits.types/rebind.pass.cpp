@@ -90,7 +90,10 @@ int main()
     static_assert((std::is_same<std::pointer_traits<C<char, int> >::rebind<double>, C<double, int> >::value), "");
     static_assert((std::is_same<std::pointer_traits<D<char, int> >::rebind<double>, D1<double, int> >::value), "");
     static_assert((std::is_same<std::pointer_traits<E<char, int> >::rebind<double>, E<double, int> >::value), "");
+#if defined(__clang__) || !(defined(__cpp_concepts) && defined(__GNUC__))
+    // Avoid triggering https://gcc.gnu.org/bugzilla/shobug.cgi?id=67225.
     static_assert((std::is_same<std::pointer_traits<F<char, int> >::rebind<double>, F<double, int> >::value), "");
+#endif
 
 #if TEST_STD_VER >= 14
     static_assert((std::is_same<std::pointer_traits<G<char, int> >::rebind<double>, G<double, int> >::value), "");

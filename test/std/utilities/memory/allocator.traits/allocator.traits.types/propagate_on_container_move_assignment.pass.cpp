@@ -50,6 +50,9 @@ int main()
     static_assert((std::is_same<std::allocator_traits<A<char> >::propagate_on_container_move_assignment, std::true_type>::value), "");
     static_assert((std::is_same<std::allocator_traits<B<char> >::propagate_on_container_move_assignment, std::false_type>::value), "");
 #if TEST_STD_VER >= 11
+#if defined(__clang__) || !(defined(__cpp_concepts) && defined(__GNUC__))
+    // Avoid triggering https://gcc.gnu.org/bugzilla/shobug.cgi?id=67225.
     static_assert((std::is_same<std::allocator_traits<C<char> >::propagate_on_container_move_assignment, std::false_type>::value), "");
+#endif
 #endif
 }

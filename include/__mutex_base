@@ -55,8 +55,8 @@ public:
     ~mutex();
 
 private:
-    mutex(const mutex&);// = delete;
-    mutex& operator=(const mutex&);// = delete;
+    mutex(const mutex&) _LIBCPP_EQUAL_DELETE;
+    mutex& operator=(const mutex&) _LIBCPP_EQUAL_DELETE;
 
 public:
     void lock() _LIBCPP_THREAD_SAFETY_ANNOTATION(acquire_capability());
@@ -154,8 +154,8 @@ public:
     }
 
 private:
-    unique_lock(unique_lock const&); // = delete;
-    unique_lock& operator=(unique_lock const&); // = delete;
+    unique_lock(unique_lock const&) _LIBCPP_EQUAL_DELETE;
+    unique_lock& operator=(unique_lock const&) _LIBCPP_EQUAL_DELETE;
 
 public:
 #ifndef _LIBCPP_CXX03_LANG
@@ -303,8 +303,8 @@ public:
     ~condition_variable();
 
 private:
-    condition_variable(const condition_variable&); // = delete;
-    condition_variable& operator=(const condition_variable&); // = delete;
+    condition_variable(const condition_variable&) _LIBCPP_EQUAL_DELETE;
+    condition_variable& operator=(const condition_variable&) _LIBCPP_EQUAL_DELETE;
 
 public:
     void notify_one() _NOEXCEPT;
