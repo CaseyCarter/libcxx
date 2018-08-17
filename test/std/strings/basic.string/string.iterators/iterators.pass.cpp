@@ -33,6 +33,13 @@ int main()
         assert ( ii1 == cii );
         assert ( !(ii1 != ii2 ));
         assert ( !(ii1 != cii ));
+
+#ifdef _LIBCPP_HAS_RANGES
+        static_assert(std::Same<std::contiguous_iterator_tag,
+            typename std::iterator_traits<C::iterator>::iterator_concept>);
+        static_assert(std::Same<std::contiguous_iterator_tag,
+            typename std::iterator_traits<C::const_iterator>::iterator_concept>);
+#endif
     }
 
     { // N3644 testing
@@ -45,6 +52,13 @@ int main()
         assert ( ii1 == cii );
         assert ( !(ii1 != ii2 ));
         assert ( !(ii1 != cii ));
+
+#ifdef _LIBCPP_HAS_RANGES
+        static_assert(std::Same<std::contiguous_iterator_tag,
+            typename std::iterator_traits<C::iterator>::iterator_concept>);
+        static_assert(std::Same<std::contiguous_iterator_tag,
+            typename std::iterator_traits<C::const_iterator>::iterator_concept>);
+#endif
     }
 
     { // N3644 testing
@@ -57,6 +71,13 @@ int main()
         assert ( ii1 == cii );
         assert ( !(ii1 != ii2 ));
         assert ( !(ii1 != cii ));
+
+#ifdef _LIBCPP_HAS_RANGES
+        static_assert(std::Same<std::contiguous_iterator_tag,
+            typename std::iterator_traits<C::iterator>::iterator_concept>);
+        static_assert(std::Same<std::contiguous_iterator_tag,
+            typename std::iterator_traits<C::const_iterator>::iterator_concept>);
+#endif
     }
 
     { // N3644 testing
@@ -69,5 +90,12 @@ int main()
         assert ( ii1 == cii );
         assert ( !(ii1 != ii2 ));
         assert ( !(ii1 != cii ));
+
+#ifdef _LIBCPP_HAS_RANGES
+        static_assert(std::Same<std::contiguous_iterator_tag,
+            typename std::iterator_traits<C::iterator>::iterator_concept>);
+        static_assert(std::Same<std::contiguous_iterator_tag,
+            typename std::iterator_traits<C::const_iterator>::iterator_concept>);
+#endif
     }
 }

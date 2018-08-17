@@ -28,5 +28,11 @@ int main()
         const std::valarray<T> v(a, N);
         assert(v[v.size()-1] == 5);
         assert(static_cast<std::size_t>(end(v) - begin(v)) == v.size());
+
+#ifdef _LIBCPP_HAS_RANGES
+#error
+        static_assert(std::Same<std::contiguous_iterator_tag,
+            std::iterator_traits<decltype(std::end(v))>::iterator_concept>);
+#endif
     }
 }

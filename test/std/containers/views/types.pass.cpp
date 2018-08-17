@@ -46,6 +46,10 @@ void testIterator()
     ASSERT_SAME_TYPE(typename ItT::reference,         typename S::reference);
     ASSERT_SAME_TYPE(typename ItT::pointer,           typename S::pointer);
     ASSERT_SAME_TYPE(typename ItT::difference_type,   typename S::difference_type);
+
+#ifdef _LIBCPP_HAS_RANGES
+    ASSERT_SAME_TYPE(typename ItT::iterator_concept, std::contiguous_iterator_tag);
+#endif
 }
 
 template <typename S, typename Iter>
@@ -60,6 +64,10 @@ void testConstIterator()
     ASSERT_SAME_TYPE(typename ItT::reference,         typename S::element_type const &);
     ASSERT_SAME_TYPE(typename ItT::pointer,           typename S::element_type const *);
     ASSERT_SAME_TYPE(typename ItT::difference_type,   typename S::difference_type);
+
+#ifdef _LIBCPP_HAS_RANGES
+    ASSERT_SAME_TYPE(typename ItT::iterator_concept, std::contiguous_iterator_tag);
+#endif
 }
 
 template <typename S, typename ElementType, std::ptrdiff_t Size>

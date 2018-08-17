@@ -26,5 +26,10 @@ int main()
         const unsigned N = sizeof(a)/sizeof(a[0]);
         const std::valarray<T> v(a, N);
         assert(v[0] == 1);
+
+#ifdef _LIBCPP_HAS_RANGES
+        static_assert(std::Same<std::contiguous_iterator_tag,
+            std::iterator_traits<decltype(std::begin(v))>::iterator_concept>);
+#endif
     }
 }

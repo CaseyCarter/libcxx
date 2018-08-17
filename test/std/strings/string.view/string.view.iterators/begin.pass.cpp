@@ -37,6 +37,12 @@ test(S s)
     assert(  b == cb1);
     assert(  b == cb2);
     assert(cb1 == cb2);
+
+#ifdef _LIBCPP_HAS_RANGES
+    // Test rvalue friend begin overloads
+    assert(ranges::begin(S{s})  == ranges::begin(s));
+    assert(ranges::cbegin(S{s}) == ranges::cbegin(s));
+#endif
 }
 
 
