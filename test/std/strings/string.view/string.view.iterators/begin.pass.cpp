@@ -40,8 +40,8 @@ test(S s)
 
 #ifdef _LIBCPP_HAS_RANGES
     // Test rvalue friend begin overloads
-    assert(ranges::begin(S{s})  == ranges::begin(s));
-    assert(ranges::cbegin(S{s}) == ranges::cbegin(s));
+    assert(std::ranges::begin(S{s})  == std::ranges::begin(s));
+    assert(std::ranges::cbegin(S{s}) == std::ranges::cbegin(s));
 #endif
 }
 

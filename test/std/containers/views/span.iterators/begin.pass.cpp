@@ -42,8 +42,8 @@ constexpr bool testConstexprSpan(Span s)
 
 #ifdef _LIBCPP_HAS_RANGES
     // Test rvalue friend begin overloads
-    ret = ret && (ranges::begin(Span{s})  == ranges::begin(s));
-    ret = ret && (ranges::cbegin(Span{s}) == ranges::cbegin(s));
+    ret = ret && (std::ranges::begin(Span{s})  == std::ranges::begin(s));
+    ret = ret && (std::ranges::cbegin(Span{s}) == std::ranges::cbegin(s));
 #endif
 
     return ret;
@@ -72,8 +72,8 @@ void testRuntimeSpan(Span s)
 
 #ifdef _LIBCPP_HAS_RANGES
     // Test rvalue friend begin overloads
-    assert(ranges::begin(Span{s})  == ranges::begin(s));
-    assert(ranges::cbegin(Span{s}) == ranges::cbegin(s));
+    assert(std::ranges::begin(Span{s})  == std::ranges::begin(s));
+    assert(std::ranges::cbegin(Span{s}) == std::ranges::cbegin(s));
 #endif
 }
 

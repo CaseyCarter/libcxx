@@ -352,6 +352,11 @@ public:
     _LIBCPP_INLINE_VISIBILITY constexpr const_reverse_iterator crbegin() const noexcept { return const_reverse_iterator(cend()); }
     _LIBCPP_INLINE_VISIBILITY constexpr const_reverse_iterator   crend() const noexcept { return const_reverse_iterator(cbegin()); }
 
+#ifdef _LIBCPP_HAS_RANGES
+    _LIBCPP_INLINE_VISIBILITY constexpr friend iterator  begin(span __s)       noexcept { return __s.begin(); }
+    _LIBCPP_INLINE_VISIBILITY constexpr friend iterator    end(span __s)       noexcept { return __s.end(); }
+#endif
+
     _LIBCPP_INLINE_VISIBILITY constexpr void swap(span &__other) noexcept
     {
         pointer __p = __data;
@@ -516,6 +521,11 @@ public:
     _LIBCPP_INLINE_VISIBILITY constexpr reverse_iterator          rend() const noexcept { return reverse_iterator(begin()); }
     _LIBCPP_INLINE_VISIBILITY constexpr const_reverse_iterator crbegin() const noexcept { return const_reverse_iterator(cend()); }
     _LIBCPP_INLINE_VISIBILITY constexpr const_reverse_iterator   crend() const noexcept { return const_reverse_iterator(cbegin()); }
+
+#ifdef _LIBCPP_HAS_RANGES
+    _LIBCPP_INLINE_VISIBILITY constexpr friend iterator  begin(span __s)       noexcept { return __s.begin(); }
+    _LIBCPP_INLINE_VISIBILITY constexpr friend iterator    end(span __s)       noexcept { return __s.end(); }
+#endif
 
     _LIBCPP_INLINE_VISIBILITY constexpr void swap(span &__other) noexcept
     {
