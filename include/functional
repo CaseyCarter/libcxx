@@ -2527,10 +2527,10 @@ private:
 
 #endif // _LIBCPP_STD_VER > 14
 
-#if _LIBCPP_HAS_RANGES
+#ifdef _LIBCPP_HAS_RANGES
 namespace ranges {
     template <class _Tp = void>
-        requires EqualityComparable<_Tp> || Same<_Tp, void> || __uses_ptr_equal(const _Tp&, const _Tp&)
+        requires EqualityComparable<_Tp> || Same<_Tp, void> || __uses_ptr_equal<const _Tp&, const _Tp&>
     struct not_equal_to {
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
         bool operator()(const _Tp& __x, const _Tp& __y) const
@@ -2541,7 +2541,7 @@ namespace ranges {
     template <>
     struct not_equal_to<void> {
         template <class _Tp, class _Up>
-            requires EqualityComparableWith<_Tp, _Up> || __uses_ptr_equal(_Tp, _Up)
+            requires EqualityComparableWith<_Tp, _Up> || __uses_ptr_equal<_Tp, _Up>
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
         bool operator()(_Tp&& __t, _Up&& __u) const
             _NOEXCEPT_(noexcept(__test_convert<bool>(
@@ -2552,7 +2552,7 @@ namespace ranges {
     };
 
     template <class _Tp = void>
-        requires StrictTotallyOrdered<_Tp> || Same<_Tp, void> || __uses_ptr_less(const _Tp&, const _Tp&)
+        requires StrictTotallyOrdered<_Tp> || Same<_Tp, void> || __uses_ptr_less<const _Tp&, const _Tp&>
     struct greater {
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
         bool operator()(const _Tp& __x, const _Tp& __y)
@@ -2563,7 +2563,7 @@ namespace ranges {
     template <>
     struct greater<void> {
         template <class _Tp, class _Up>
-            requires StrictTotallyOrderedWith<_Tp, _Up> || __uses_ptr_less(_Up, _Tp)
+            requires StrictTotallyOrderedWith<_Tp, _Up> || __uses_ptr_less<_Up, _Tp>
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
         bool operator()(_Tp&& __t, _Up&& __u) const
             _NOEXCEPT_(noexcept(__test_convert<bool>(
@@ -2574,7 +2574,7 @@ namespace ranges {
     };
 
     template <class _Tp = void>
-        requires StrictTotallyOrdered<_Tp> || Same<_Tp, void> || __uses_ptr_less(const _Tp&, const _Tp&)
+        requires StrictTotallyOrdered<_Tp> || Same<_Tp, void> || __uses_ptr_less<const _Tp&, const _Tp&>
     struct less_equal {
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
         bool operator()(const _Tp& __x, const _Tp& __y)
@@ -2585,7 +2585,7 @@ namespace ranges {
     template <>
     struct less_equal<void> {
         template <class _Tp, class _Up>
-            requires StrictTotallyOrderedWith<_Tp, _Up> || __uses_ptr_less(_Up, _Tp)
+            requires StrictTotallyOrderedWith<_Tp, _Up> || __uses_ptr_less<_Up, _Tp>
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
         bool operator()(_Tp&& __t, _Up&& __u) const
             _NOEXCEPT_(noexcept(__test_convert<bool>(
@@ -2596,7 +2596,7 @@ namespace ranges {
     };
 
     template <class _Tp = void>
-        requires StrictTotallyOrdered<_Tp> || Same<_Tp, void> || __uses_ptr_less(const _Tp&, const _Tp&)
+        requires StrictTotallyOrdered<_Tp> || Same<_Tp, void> || __uses_ptr_less<const _Tp&, const _Tp&>
     struct greater_equal {
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
         bool operator()(const _Tp& __x, const _Tp& __y)
@@ -2607,7 +2607,7 @@ namespace ranges {
     template <>
     struct greater_equal<void> {
         template <class _Tp, class _Up>
-            requires StrictTotallyOrderedWith<_Tp, _Up> || __uses_ptr_less(_Tp, _Up)
+            requires StrictTotallyOrderedWith<_Tp, _Up> || __uses_ptr_less<_Tp, _Up>
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
         bool operator()(_Tp&& __t, _Up&& __u) const
             _NOEXCEPT_(noexcept(__test_convert<bool>(
