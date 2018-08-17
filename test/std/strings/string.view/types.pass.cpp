@@ -66,6 +66,13 @@ test()
     static_assert(S::npos == -1, "");
     static_assert((std::is_same<typename S::iterator,         typename S::const_iterator>::value), "");
     static_assert((std::is_same<typename S::reverse_iterator, typename S::const_reverse_iterator>::value), "");
+
+#ifdef _LIBCPP_HAS_RANGES
+    static_assert(std::Same<std::contiguous_iterator_tag,
+        typename std::iterator_traits<typename S::iterator>::iterator_concept>);
+    static_assert(std::Same<std::contiguous_iterator_tag,
+        typename std::iterator_traits<typename S::const_iterator>::iterator_concept>);
+#endif
 }
 
 int main()

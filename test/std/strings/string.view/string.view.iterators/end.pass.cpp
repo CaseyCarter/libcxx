@@ -46,6 +46,12 @@ test(S s)
     assert(  e == ce1);
     assert(  e == ce2);
     assert(ce1 == ce2);
+
+#ifdef _LIBCPP_HAS_RANGES
+    // Test rvalue friend end overloads
+    assert(ranges::end(S{s})  == ranges::end(s));
+    assert(ranges::cend(S{s}) == ranges::cend(s));
+#endif
 }
 
 

@@ -43,6 +43,13 @@ constexpr bool testConstexprSpan(Span s)
     ret = ret &&  ((ce - s.cbegin()) == s.size());
 
     ret = ret &&  (e == ce);
+
+#ifdef _LIBCPP_HAS_RANGES
+    // Test rvalue friend end overloads
+    ret = ret && (ranges::end(Span{s})  == ranges::end(s));
+    ret = ret && (ranges::cend(Span{s}) == ranges::cend(s));
+#endif
+
     return ret;
 }
 
@@ -69,6 +76,12 @@ void testRuntimeSpan(Span s)
     assert((ce - s.cbegin()) == s.size());
 
     assert(e == ce);
+
+#ifdef _LIBCPP_HAS_RANGES
+    // Test rvalue friend end overloads
+    assert(ranges::end(Span{s})  == ranges::end(s));
+    assert(ranges::cend(Span{s}) == ranges::cend(s));
+#endif
 }
 
 

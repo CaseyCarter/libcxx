@@ -29,5 +29,10 @@ int main()
         *(end(v) - 1) = 10;
         assert(v[v.size()-1] == 10);
         assert(static_cast<std::size_t>(end(v) - begin(v)) == v.size());
+
+#ifdef _LIBCPP_HAS_RANGES
+        static_assert(std::Same<std::contiguous_iterator_tag,
+            std::iterator_traits<decltype(std::end(v))>::iterator_concept>);
+#endif
     }
 }

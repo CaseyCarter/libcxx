@@ -17,6 +17,13 @@
 template <class C>
 void test_contiguous ( const C &c )
 {
+#ifdef _LIBCPP_HAS_RANGES
+    static_assert(std::Same<std::contiguous_iterator_tag,
+        typename std::iterator_traits<typename C::iterator>::iterator_concept>);
+    static_assert(std::Same<std::contiguous_iterator_tag,
+        typename std::iterator_traits<typename C::const_iterator>::iterator_concept>);
+#endif
+
     for ( size_t i = 0; i < c.size(); ++i )
         assert ( *(c.begin() + i) == *(std::addressof(*c.begin()) + i));
 }
