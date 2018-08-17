@@ -55,10 +55,7 @@ void testIterator()
     ASSERT_SAME_TYPE(typename ItT::difference_type,   typename S::difference_type);
 
 #ifdef _LIBCPP_HAS_RANGES
-#if 1 // FIXME
-    static_assert(std::Readable<Iter>);
-#endif // FIXME
-    if constexpr (!is_reverse_iterator<Iter>)
+    if constexpr (!(std::is_volatile_v<typename S::element_type> || is_reverse_iterator<Iter>))
         static_assert(std::ContiguousIterator<Iter>);
 #endif
 }
@@ -77,10 +74,7 @@ void testConstIterator()
     ASSERT_SAME_TYPE(typename ItT::difference_type,   typename S::difference_type);
 
 #ifdef _LIBCPP_HAS_RANGES
-#if 1 // FIXME
-    static_assert(std::Readable<Iter>);
-#endif // FIXME
-    if constexpr (!is_reverse_iterator<Iter>)
+    if constexpr (!(std::is_volatile_v<typename S::element_type> || is_reverse_iterator<Iter>))
         static_assert(std::ContiguousIterator<Iter>);
 #endif
 }
