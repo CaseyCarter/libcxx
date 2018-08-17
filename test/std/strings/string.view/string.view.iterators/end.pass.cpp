@@ -49,8 +49,8 @@ test(S s)
 
 #ifdef _LIBCPP_HAS_RANGES
     // Test rvalue friend end overloads
-    assert(ranges::end(S{s})  == ranges::end(s));
-    assert(ranges::cend(S{s}) == ranges::cend(s));
+    assert(std::ranges::end(S{s})  == std::ranges::end(s));
+    assert(std::ranges::cend(S{s}) == std::ranges::cend(s));
 #endif
 }
 

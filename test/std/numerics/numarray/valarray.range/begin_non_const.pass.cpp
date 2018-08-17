@@ -29,8 +29,7 @@ int main()
         assert(v[0] == 10);
 
 #ifdef _LIBCPP_HAS_RANGES
-        static_assert(std::Same<std::contiguous_iterator_tag,
-            std::iterator_traits<decltype(std::begin(v))>::iterator_concept>);
+        static_assert(std::ContiguousIterator<decltype(std::begin(v))>);
 #endif
     }
 }

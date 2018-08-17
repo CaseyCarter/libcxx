@@ -36,6 +36,13 @@
 
 #include "test_macros.h"
 
+#ifdef _LIBCPP_HAS_RANGES
+template<class>
+constexpr bool is_reverse_iterator = false;
+template<class I>
+constexpr bool is_reverse_iterator<std::reverse_iterator<I>> = true;
+#endif
+
 template <typename S, typename Iter>
 void testIterator()
 {
@@ -48,7 +55,11 @@ void testIterator()
     ASSERT_SAME_TYPE(typename ItT::difference_type,   typename S::difference_type);
 
 #ifdef _LIBCPP_HAS_RANGES
-    ASSERT_SAME_TYPE(typename ItT::iterator_concept, std::contiguous_iterator_tag);
+#if 1 // FIXME
+    static_assert(std::Readable<Iter>);
+#endif // FIXME
+    if constexpr (!is_reverse_iterator<Iter>)
+        static_assert(std::ContiguousIterator<Iter>);
 #endif
 }
 
@@ -66,7 +77,11 @@ void testConstIterator()
     ASSERT_SAME_TYPE(typename ItT::difference_type,   typename S::difference_type);
 
 #ifdef _LIBCPP_HAS_RANGES
-    ASSERT_SAME_TYPE(typename ItT::iterator_concept, std::contiguous_iterator_tag);
+#if 1 // FIXME
+    static_assert(std::Readable<Iter>);
+#endif // FIXME
+    if constexpr (!is_reverse_iterator<Iter>)
+        static_assert(std::ContiguousIterator<Iter>);
 #endif
 }
 
