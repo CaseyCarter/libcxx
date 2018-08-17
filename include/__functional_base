@@ -699,7 +699,7 @@ _LIBCPP_CONCEPT_DECL __has_nonmember_equal = requires(_Tp&& __t, _Up&& __u) {
 };
 
 template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL __uses_ptr_equal = _has_equal<_Tp, _Up> &&
+_LIBCPP_CONCEPT_DECL __uses_ptr_equal = __has_equal<_Tp, _Up> &&
     !(__has_member_equal<_Tp, _Up> ||
       __has_nonmember_equal<_Tp, _Up> ||
       __has_member_spaceship<_Tp, _Up> ||
@@ -720,7 +720,7 @@ _LIBCPP_CONCEPT_DECL __has_nonmember_less = requires(_Tp&& __t, _Up&& __u) {
 };
 
 template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL __uses_ptr_less = _has_less<_Tp, _Up> &&
+_LIBCPP_CONCEPT_DECL __uses_ptr_less = __has_less<_Tp, _Up> &&
     !(__has_member_less<_Tp, _Up> ||
       __has_nonmember_less<_Tp, _Up> ||
       __has_member_spaceship<_Tp, _Up> ||
@@ -730,7 +730,7 @@ _LIBCPP_CONCEPT_DECL __uses_ptr_less = _has_less<_Tp, _Up> &&
 namespace ranges
 {
     template <class _Tp = void>
-        requires EqualityComparable<_Tp> || Same<_Tp, void> || __uses_ptr_equal(const _Tp&, const _Tp&)
+        requires EqualityComparable<_Tp> || Same<_Tp, void> || __uses_ptr_equal<const _Tp&, const _Tp&>
     struct equal_to {
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
         bool operator()(const _Tp& __x, const _Tp& __y) const
@@ -741,7 +741,7 @@ namespace ranges
     template <>
     struct equal_to<void> {
         template <class _Tp, class _Up>
-            requires EqualityComparableWith<_Tp, _Up> || __uses_ptr_equal(_Tp, _Up)
+            requires EqualityComparableWith<_Tp, _Up> || __uses_ptr_equal<_Tp, _Up>
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
         bool operator()(_Tp&& __t, _Up&& __u) const
             _NOEXCEPT_(noexcept(__test_convert<bool>(
@@ -752,7 +752,7 @@ namespace ranges
     };
 
     template <class _Tp = void>
-        requires StrictTotallyOrdered<_Tp> || Same<_Tp, void> || __uses_ptr_less(const _Tp&, const _Tp&)
+        requires StrictTotallyOrdered<_Tp> || Same<_Tp, void> || __uses_ptr_less<const _Tp&, const _Tp&>
     struct less {
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
         bool operator()(const _Tp& __x, const _Tp& __y)
@@ -763,7 +763,7 @@ namespace ranges
     template <>
     struct less<void> {
         template <class _Tp, class _Up>
-            requires StrictTotallyOrderedWith<_Tp, _Up> || __uses_ptr_less(_Tp, _Up)
+            requires StrictTotallyOrderedWith<_Tp, _Up> || __uses_ptr_less<_Tp, _Up>
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
         bool operator()(_Tp&& __t, _Up&& __u) const
             _NOEXCEPT_(noexcept(__test_convert<bool>(
