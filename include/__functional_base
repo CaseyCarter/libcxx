@@ -755,7 +755,7 @@ namespace ranges
         requires StrictTotallyOrdered<_Tp> || Same<_Tp, void> || __uses_ptr_less<const _Tp&, const _Tp&>
     struct less {
         _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
-        bool operator()(const _Tp& __x, const _Tp& __y)
+        bool operator()(const _Tp& __x, const _Tp& __y) const
             _NOEXCEPT_(noexcept(__test_convert<bool>(__x < __y))) // strengthened
         { return __x < __y; }
     };
