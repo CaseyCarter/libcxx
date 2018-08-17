@@ -1345,7 +1345,7 @@ namespace ranges
         requires requires(__const_thru_ref<_Tp>&& __t) {
             begin(static_cast<__const_thru_ref<_Tp>&&>(__t));
         }
-        constexpr auto operator()(_Tp&& __t)
+        constexpr auto operator()(_Tp&& __t) const
             _NOEXCEPT_(noexcept(begin(static_cast<__const_thru_ref<_Tp>&&>(__t))))
         {
             return begin(static_cast<__const_thru_ref<_Tp>&&>(__t));
@@ -1362,7 +1362,7 @@ namespace ranges
         requires requires(__const_thru_ref<_Tp>&& __t) {
             end(static_cast<__const_thru_ref<_Tp>&&>(__t));
         }
-        constexpr auto operator()(_Tp&& __t)
+        constexpr auto operator()(_Tp&& __t) const
             _NOEXCEPT_(noexcept(end(static_cast<__const_thru_ref<_Tp>&&>(__t))))
         {
             return end(static_cast<__const_thru_ref<_Tp>&&>(__t));
@@ -1415,7 +1415,7 @@ namespace ranges
                     { end(static_cast<_Tp&&>(__t)) } ->
                         Same<decltype(begin(static_cast<_Tp&&>(__t)))>;
                 }
-            constexpr auto operator()(_Tp&& __t)
+            constexpr auto operator()(_Tp&& __t) const
                 _NOEXCEPT_(noexcept(_VSTD::make_reverse_iterator(end(static_cast<_Tp&&>(__t)))))
             {
                 return _VSTD::make_reverse_iterator(end(static_cast<_Tp&&>(__t)));
@@ -1473,7 +1473,7 @@ namespace ranges
                     { end(static_cast<_Tp&&>(__t)) } ->
                         Same<decltype(begin(static_cast<_Tp&&>(__t)))>;
                 }
-            constexpr auto operator()(_Tp&& __t)
+            constexpr auto operator()(_Tp&& __t) const
                 _NOEXCEPT_(noexcept(_VSTD::make_reverse_iterator(begin(static_cast<_Tp&&>(__t)))))
             {
                 return _VSTD::make_reverse_iterator(begin(static_cast<_Tp&&>(__t)));
@@ -1491,7 +1491,7 @@ namespace ranges
         requires requires(__const_thru_ref<_Tp>&& __t) {
             rbegin(static_cast<__const_thru_ref<_Tp>&&>(__t));
         }
-        constexpr auto operator()(_Tp&& __t)
+        constexpr auto operator()(_Tp&& __t) const
             _NOEXCEPT_(noexcept(rbegin(static_cast<__const_thru_ref<_Tp>&&>(__t))))
         {
             return rbegin(static_cast<__const_thru_ref<_Tp>&&>(__t));
@@ -1508,7 +1508,7 @@ namespace ranges
         requires requires(__const_thru_ref<_Tp>&& __t) {
             rend(static_cast<__const_thru_ref<_Tp>&&>(__t));
         }
-        constexpr auto operator()(_Tp&& __t)
+        constexpr auto operator()(_Tp&& __t) const
             _NOEXCEPT_(noexcept(rend(static_cast<__const_thru_ref<_Tp>&&>(__t))))
         {
             return rend(static_cast<__const_thru_ref<_Tp>&&>(__t));
@@ -1558,7 +1558,7 @@ namespace ranges
 
             template <class _Tp>
             requires !__has_member<_Tp> && __has_adl<_Tp>
-            constexpr auto operator()(_Tp&& __t)
+            constexpr auto operator()(_Tp&& __t) const
                 _NOEXCEPT_(noexcept(_VSTD::__test_convert(size(static_cast<_Tp&&>(__t)))))
             {
                 return size(static_cast<_Tp&&>(__t));
@@ -1698,7 +1698,7 @@ namespace ranges
         requires requires(__const_thru_ref<_Tp>&& __t) {
             data(static_cast<__const_thru_ref<_Tp>&&>(__t));
         }
-        constexpr auto operator()(_Tp&& __t)
+        constexpr auto operator()(_Tp&& __t) const
             _NOEXCEPT_(noexcept(data(static_cast<__const_thru_ref<_Tp>&&>(__t))))
         {
             return data(static_cast<__const_thru_ref<_Tp>&&>(__t));
@@ -3424,14 +3424,14 @@ public:
     { return !(__x < __y); }
 
     friend constexpr iter_rvalue_reference_t<_Iter> iter_move(const counted_iterator& __x)
-    _NOEXCEPT_(noexcept(ranges::iter_move(__x.__current_)))
+    _NOEXCEPT_(noexcept(_VSTD::ranges::iter_move(__x.__current_)))
     requires InputIterator<_Iter>
-    { return ranges::iter_move(__x.__current_); }
+    { return _VSTD::ranges::iter_move(__x.__current_); }
 
     template <IndirectlySwappable<_Iter> _Iter2>
     friend constexpr void iter_swap(const counted_iterator& __x, const counted_iterator<_Iter2>& __y)
-    _NOEXCEPT_(noexcept(ranges::iter_swap(__x.__current_, __y.__current_)))
-    { return ranges::iter_swap(__x.__current_, __y.__current_); }
+    _NOEXCEPT_(noexcept(_VSTD::ranges::iter_swap(__x.__current_, __y.__current_)))
+    { return _VSTD::ranges::iter_swap(__x.__current_, __y.__current_); }
 };
 
 template <Readable _Iter>
@@ -3554,7 +3554,8 @@ public:
     typedef typename iterator_traits<iterator_type>::pointer           pointer;
     typedef typename iterator_traits<iterator_type>::reference         reference;
 #ifdef _LIBCPP_HAS_RANGES
-    using iterator_concept = __select<is_pointer_v<_Iter>, contiguous_iterator_tag, iterator_category>;
+    using iterator_concept =
+        __select<ContiguousIterator<_Iter>, contiguous_iterator_tag, iterator_category>;
 #endif
 private:
     iterator_type __i;
