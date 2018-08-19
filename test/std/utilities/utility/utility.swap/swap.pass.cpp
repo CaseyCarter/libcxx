@@ -41,7 +41,8 @@ struct NoexceptMoveOnly {
 
 struct NotMoveConstructible {
     NotMoveConstructible& operator=(NotMoveConstructible&&) { return *this; }
-#if defined(__GNUC__) && !defined(__clang__) && defined(__cpp_concepts) // FIXME: write a bug test
+#if defined(__GNUC__) && !defined(__clang__) && defined(__cpp_concepts)
+    // Avoid triggering https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67225.
     NotMoveConstructible(NotMoveConstructible&&) = delete;
 #else
 private:
@@ -51,10 +52,11 @@ private:
 
 struct NotMoveAssignable {
     NotMoveAssignable(NotMoveAssignable&&);
-#if defined(__GNUC__) && !defined(__clang__) && defined(__cpp_concepts) // FIXME: write a bug test
+private:
+#if defined(__GNUC__) && !defined(__clang__) && defined(__cpp_concepts)
+    // Avoid triggering https://gcc.gnu.org/bugzilla/show_bug.cgi?id=67225.
     NotMoveAssignable& operator=(NotMoveAssignable&&) = delete;
 #else
-private:
     NotMoveAssignable& operator=(NotMoveAssignable&&);
 #endif
 };
