@@ -1,0 +1,589 @@
+// -*- C++ -*-
+//===--------------------------- ranges -----------------------------------===//
+//
+//                     The LLVM Compiler Infrastructure
+//
+// This file is dual licensed under the MIT and the University of Illinois Open
+// Source Licenses. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+
+#ifndef _LIBCPP_RANGES
+#define _LIBCPP_RANGES
+
+// TODO:
+// * "new header" stuff
+
+/*
+    ranges synopsis
+
+// C++20
+
+namespace std::ranges {
+  inline namespace unspecified {
+    // 23.4, range access
+    inline constexpr unspecified begin = unspecified;
+    inline constexpr unspecified end = unspecified;
+    inline constexpr unspecified cbegin = unspecified;
+    inline constexpr unspecified cend = unspecified;
+    inline constexpr unspecified rbegin = unspecified;
+    inline constexpr unspecified rend = unspecified;
+    inline constexpr unspecified crbegin = unspecified;
+    inline constexpr unspecified crend = unspecified;
+    // 23.5, range primitives
+    inline constexpr unspecified size = unspecified;
+    inline constexpr unspecified empty = unspecified;
+    inline constexpr unspecified data = unspecified;
+    inline constexpr unspecified cdata = unspecified;
+  }
+
+  template <class T>
+  using iterator_t = decltype(ranges::begin(declval<T&>()));
+
+  template <class T>
+  using sentinel_t = decltype(ranges::end(declval<T&>()));
+
+  template <class>
+  inline constexpr bool disable_sized_range = false;
+
+  template <class>
+  struct enable_view { };
+
+  struct view_base { };
+
+  template <Range R>
+  using safe_iterator_t = decltype(ranges::begin(declval<R>()));
+
+  // 23.6, range requirements
+  // 23.6.2, Range
+  template <class T>
+  concept Range = see below;
+
+  template <class T>
+  concept SizedRange = see below;
+
+  // 23.6.4, View
+  template <class T>
+  concept View = see below;
+
+  // 23.6.5, CommonRange
+  template <class T>
+  concept CommonRange = see below;
+
+  // 23.6.6, InputRange
+  template <class T>
+  concept InputRange = see below;
+  // 23.6.7, OutputRange
+  template <class R, class T>
+  concept OutputRange = see below;
+  // 23.6.8, ForwardRange
+  template <class T>
+  concept ForwardRange = see below;
+  // 23.6.9, BidirectionalRange
+  template <class T>
+  concept BidirectionalRange = see below;
+  // 23.6.10, RandomAccessRange
+  template <class T>
+  concept RandomAccessRange = see below;
+  // 23.6.11, ContiguousRange
+  template <class T>
+  concept ContiguousRange = see below;
+
+  // 23.6.12
+  template <class T>
+  concept ViewableRange = see below;
+
+  // 23.7.2
+  template <class D>
+    requires is_class_v<D>
+      class view_interface;
+
+  // 23.7.3.1
+  enum class subrange_kind : bool { unsized, sized };
+  template <Iterator I, Sentinel<I> S = I, subrange_kind K = see below>
+    requires K == subrange_kind::sized || !SizedSentinel<S, I>
+      class subrange;
+
+  // 23.8.4
+  namespace view { inline constexpr unspecified all = unspecified; }
+  template <ViewableRange R>
+    using all_view = decltype(view::all(declval<R>()));
+
+  // 23.8.5
+  template <InputRange R, IndirectUnaryPredicate<iterator_t<R>> Pred>
+    requires View<R>
+      class filter_view;
+
+  namespace view { inline constexpr unspecified filter = unspecified; }
+
+  // 23.8.7
+  template <InputRange R, CopyConstructible F>
+    requires View<R> && is_object_v<F> && Invocable<F&, iter_reference_t<iterator_t<R>>>
+      class transform_view;
+
+  namespace view { inline constexpr unspecified transform = unspecified; }
+
+  // 23.8.9
+  template <WeaklyIncrementable I, Semiregular Bound = unreachable>
+    requires weakly-equality-comparable-with <I, Bound>
+      class iota_view;
+
+  namespace view { inline constexpr unspecified iota = unspecified; }
+
+  // 23.8.11
+  template <View R>
+    class take_view;
+
+  namespace view { inline constexpr unspecified take = unspecified; }
+
+  // 23.8.13
+  template <InputRange R>
+    requires View<R> && InputRange<iter_reference_t<iterator_t<R>>> &&
+        (is_reference_v<iter_reference_t<iterator_t<R>>> ||
+         View<iter_value_type_t<iterator_t<R>>>)
+      class join_view;
+
+  namespace view { inline constexpr unspecified join = unspecified; }
+
+  // 23.8.15
+  template <class T>
+    requires is_object_v<T>
+      class empty_view;
+
+  namespace view {
+    template <class T>
+      inline constexpr empty_view<T> empty {};
+  }
+
+  // 23.8.16
+  template <CopyConstructible T>
+    requires is_object_v<T>
+      class single_view;
+
+  namespace view { inline constexpr unspecified single = unspecified; }
+
+
+  template <class R>
+  concept tiny-range = see below;
+
+  // 23.8.18
+  template <InputRange Rng, ForwardRange Pattern>
+    requires View<Rng> && View<Pattern> &&
+        IndirectlyComparable<iterator_t<Rng>, iterator_t<Pattern>, ranges::equal_to<>> &&
+        (ForwardRange<Rng> || tiny-range <Pattern>)
+      class split_view;
+
+  namespace view { inline constexpr unspecified split = unspecified; }
+
+  // 23.8.20
+  namespace view { inline constexpr unspecified counted = unspecified; }
+
+  // 23.8.21
+  template <View Rng>
+    requires !CommonRange<Rng>
+      class common_view;
+
+  namespace view { inline constexpr unspecified common = unspecified; }
+
+  // 23.8.23
+  template <View Rng>
+    requires BidirectionalRange<Rng>
+      class reverse_view;
+
+  namespace view { inline constexpr unspecified reverse = unspecified; }
+} // namespace std::ranges
+
+namespace std {
+  namespace view = ranges::view;
+
+  template <class I, class S, ranges::subrange_kind K>
+    struct tuple_size<ranges::subrange<I, S, K>>
+      : integral_constant<size_t, 2> {};
+  template <class I, class S, ranges::subrange_kind K>
+    struct tuple_element<0, ranges::subrange<I, S, K>> {
+      using type = I;
+    };
+  template <class I, class S, ranges::subrange_kind K>
+    struct tuple_element<1, ranges::subrange<I, S, K>> {
+      using type = S;
+    };
+} // namespace std
+
+*/
+
+#include <concepts>
+#include <initializer_list>
+#include <iterator>
+#include <version>
+
+#if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
+#pragma GCC system_header
+#endif
+
+_LIBCPP_PUSH_MACROS
+#include <__undef_macros>
+
+#if defined(_LIBCPP_HAS_NO_CONCEPTS) || _LIBCPP_STD_VER <= 17
+# if defined(_LIBCPP_WARNING)
+    _LIBCPP_WARNING("<ranges> requires compiler support for concepts and C++2a")
+# else
+#  warning <ranges> requires compiler support for concepts and C++2a
+# endif
+#else // defined(_LIBCPP_HAS_NO_CONCEPTS) || _LIBCPP_STD_VER <= 17
+
+_LIBCPP_BEGIN_NAMESPACE_STD
+
+namespace ranges {
+    template <class>
+    struct enable_view { };
+
+    template <class _Tp>
+    struct enable_view<initializer_list<_Tp>> : false_type { };
+
+    struct view_base { };
+
+    template <Range _Rng>
+    using safe_iterator_t = decltype(_VSTD::ranges::begin(_VSTD::declval<_Rng>()));
+
+    template <class _Tp>
+    inline constexpr bool __view_predicate<_Tp> =
+        DerivedFrom<_Tp, view_base> ||
+            !Range<const _Tp> ||
+            Same<iter_reference_t<iterator_t<_Tp>, iter_reference_t<iterator_t<const _Tp>>>;
+
+    template <class _Tp>
+        requires requires { typename enable_view<_Tp>::type; }
+    inline constexpr bool __view_predicate<_Tp> =
+        enable_view<_Tp>::type::value;
+
+    template <class _Tp>
+    _LIBCPP_CONCEPT_DECL View =
+        Range<_Tp> && Semiregular<_Tp> && __view_predicate<_Tp>;
+
+    template <class _Tp>
+    _LIBCPP_CONCEPT_DECL CommonRange =
+        Range<_Tp> && Same<iterator_t<_Tp>, sentinel_t<_Tp>>;
+
+    template <class _Tp>
+    _LIBCPP_CONCEPT_DECL InputRange =
+        Range<_Tp> && InputIterator<iterator_t<_Tp>>;
+
+    template <class _Tp, class _Up>
+    _LIBCPP_CONCEPT_DECL OutputRange =
+        Range<_Tp> && OutputIterator<iterator_t<_Tp>, _Up>;
+
+    template <class _Tp>
+    _LIBCPP_CONCEPT_DECL ForwardRange =
+        InputRange<_Tp> && ForwardIterator<iterator_t<_Tp>>;
+
+    template <class _Tp>
+    _LIBCPP_CONCEPT_DECL BidirectionalRange =
+        ForwardRange<_Tp> && BidirectionalIterator<iterator_t<_Tp>>;
+
+    template <class _Tp>
+    _LIBCPP_CONCEPT_DECL RandomAccessRange =
+        BidirectionalRange<_Tp> && RandomAccessIterator<iterator_t<_Tp>>;
+
+    template <class _Tp>
+    _LIBCPP_CONCEPT_DECL ContiguousRange =
+        RandomAccessRange<_Tp> && ContiguousIterator<iterator_t<_Tp>> &&
+        requires(_Tp& __t) {
+            _VSTD::ranges::data(__t);
+            requires Same<decltype(_VSTD::ranges::data(__t)), add_pointer_t<iter_reference_t<iterator_t<_Tp>>>>;
+        };
+
+    template <class _Tp>
+    _LIBCPP_CONCEPT_DECL ViewableRange =
+        Range<_Tp> && (__forwarding_range<_Tp> || View<remove_reference_t<_Tp>>);
+
+    template <Range _Tp>
+    struct __range_common_iterator_impl {
+        using type = common_iterator<iterator_t<_Tp>, sentinel_t<_Tp>>;
+    };
+    template <CommonRange _Tp>
+    struct __range_common_iterator_impl<_Tp> {
+        using type = iterator_t<_Tp>;
+    };
+    template <Range _Tp>
+    using __range_common_iterator =
+        typename __range_common_iterator_impl<_Tp>::type;
+
+    template <class _Tp>
+        requires is_class_v<_Tp>
+    class view_interface : public view_base {
+    private:
+        constexpr _Tp& __derived() _NOEXCEPT {
+            return static_cast<_Tp&>(*this);
+        }
+        constexpr const _Tp& __derived() const _NOEXCEPT {
+            return static_cast<const _Tp&>(*this);
+        }
+    public:
+        constexpr bool empty() const
+            requires ForwardRange<const _Tp>
+            _NOEXCEPT_(noexcept(_VSTD::__test_convert<bool>(
+                _VSTD::ranges::begin(__derived()) == _VSTD::ranges::end(__derived())
+            ))) // strengthened
+        { return begin(__derived()) == end(__derived()); }
+        constexpr explicit operator bool() const
+            requires requires { _VSTD::ranges::empty(__derived()); }
+            _NOEXCEPT_(noexcept(_VSTD::ranges::empty(__derived()))) // strengthened
+        { return !_VSTD::ranges::empty(__derived()); }
+
+        constexpr auto data() requires ContiguousIterator<iterator_t<_Tp>>
+        _NOEXCEPT_(noexcept(_VSTD::ranges::empty(__derived()))
+            && noexcept(*_VSTD::ranges::begin(__derived()))) // strengthened
+        {
+            auto& __d = __derived();
+            return _VSTD::ranges::empty(__d) ? nullptr
+                : _VSTD::addressof(*_VSTD::ranges::begin(__derived()));
+        }
+        constexpr auto data() const
+            requires Range<const _Tp> && ContiguousIterator<iterator_t<const _Tp>>
+        _NOEXCEPT_(noexcept(_VSTD::ranges::empty(__derived()))
+            && noexcept(*_VSTD::ranges::begin(__derived()))) // strengthened
+        {
+            auto& __d = __derived();
+            return _VSTD::ranges::empty(__d) ? nullptr
+                : _VSTD::addressof(*_VSTD::ranges::begin(__derived()));
+        }
+
+        constexpr auto size() const requires ForwardRange<const _Tp> &&
+        SizedSentinel<sentinel_t<const _Tp>, iterator_t<const _Tp>>
+        _NOEXCEPT_(noexcept(_VSTD::ranges::end(__d) - _VSTD::ranges::begin(__d))) // strengthened
+        {
+            auto& __d = __derived();
+            return _VSTD::ranges::end(__d) - _VSTD::ranges::begin(__d);
+        }
+
+        constexpr decltype(auto) front() requires ForwardRange<_Tp>
+        _NOEXCEPT_(noexcept(*_VSTD::ranges::begin(__derived()))) // strengthened
+        { return *_VSTD::ranges::begin(__derived()); }
+        constexpr decltype(auto) front() const requires ForwardRange<const _Tp>
+        _NOEXCEPT_(noexcept(*_VSTD::ranges::begin(__derived()))) // strengthened
+        { return *_VSTD::ranges::begin(__derived()); }
+
+        constexpr decltype(auto) back()
+        requires BidirectionalRange<_Tp> && CommonRange<_Tp>
+        _NOEXCEPT_(noexcept(_VSTD::ranges::end(__derived()))
+            && noexcept(*--_VSTD::declval<iterator_t<_Tp>&>())) // strengthened
+        {
+            auto __last = _VSTD::ranges::end(__derived());
+            --__last;
+            return *__last;
+        }
+        constexpr decltype(auto) back() const
+        requires BidirectionalRange<const _Tp> && CommonRange<const _Tp>
+        _NOEXCEPT_(noexcept(_VSTD::ranges::end(__derived()))
+            && noexcept(*--_VSTD::declval<iterator_t<_Tp>&>())) // strengthened
+        {
+            auto __last = _VSTD::ranges::end(__derived());
+            --__last;
+            return *__last;
+        }
+
+        template <RandomAccessRange _Up = _Tp>
+        constexpr decltype(auto) operator[](iter_difference_t<iterator_t<_Up>> __n)
+        _NOEXCEPT_(noexcept(_VSTD::ranges::begin(__derived())[__n])) // strengthened
+        { return _VSTD::ranges::begin(__derived())[__n]; }
+        template <RandomAccessRange _Up = const _Tp>
+        constexpr decltype(auto) operator[](iter_difference_t<iterator_t<_Up>> __n) const
+        _NOEXCEPT_(noexcept(_VSTD::ranges::begin(__derived())[__n])) // strengthened
+        { return _VSTD::ranges::begin(__derived())[__n]; }
+    };
+
+    enum class subrange_kind : bool { unsized, sized };
+
+    template <class _Tp>
+    _LIBCPP_CONCEPT_DECL __pair_like =
+        requires(_Tp __t) {
+            { tuple_size<_Tp>::value } -> Integral;
+            requires tuple_size<_Tp>::value == 2;
+            typename tuple_element_t<0, _Tp>;
+            typename tuple_element_t<1, _Tp>;
+            { _VSTD::get<0>(__t) } -> const tuple_element_t<0, _Tp>&;
+            { _VSTD::get<1>(__t) } -> const tuple_element_t<1, _Tp>&;
+        };
+    template <class _Tp, class _Up, class _Vp>
+    _LIBCPP_CONCEPT_DECL __pair_like_convertible_to =
+        !Range<_Tp> && __pair_like<remove_cvref_t<_Tp>> &&
+        requires(_Tp&& __t) {
+            { _VSTD::get<0>(_VSTD::forward<_Tp>(__t)) } -> ConvertibleTo<_Up>;
+            { _VSTD::get<1>(_VSTD::forward<_Tp>(__t)) } -> ConvertibleTo<_Vp>;
+        };
+    template <class _Tp, class _Up, class _Vp>
+    _LIBCPP_CONCEPT_DECL __pair_like_convertible_from =
+        !Range<_Tp> && Same<_Tp, remove_cvref_t<_Tp>> && __pair_like<_Tp> &&
+        Constructible<_Tp, _Up, _Vp>;
+    template <class _Tp>
+    _LIBCPP_CONCEPT_DECL __iterator_sentinel_pair =
+        !Range<_Tp> && Same<_Tp, remove_cvref_t<_Tp>> && __pair_like<_Tp> &&
+        Sentinel<tuple_element_t<1, _Tp>, tuple_element_t<0, _Tp>>;
+
+    template <class _Tp, class _Up>
+    _LIBCPP_CONCEPT_DECL __not_same_as =
+        !Same<remove_cvref_t<_Tp>, remove_cvref_t<_Up>>;
+
+    template<class, bool> struct __subrange_base {
+        __subrange_base() = default;
+        constexpr __subrange_base(iter_difference_t<_Iter>) noexcept {}
+    };
+    template<class _Iter> struct __subrange_base<_Iter, true> {
+        iter_difference_t<_Iter> __size_ = 0;
+
+        __subrange_base() = default;
+        constexpr __subrange_base(iter_difference_t<_Iter> __n) noexcept
+            : __size_{__n} {}
+    };
+
+    template <Iterator _Iter, Sentinel<_Iter> _Sent = _Iter, subrange_kind _Kind =
+        SizedSentinel<_Sent, _Iter> ? subrange_kind::sized : subrange_kind::unsized>
+    requires (_Kind == subrange_kind::sized || !SizedSentinel<_Sent, _Iter>)
+    class subrange
+      : private __subrange_base<_Iter, _Kind == subrange_kind::sized && !SizedSentinel<_Sent, _Iter>>
+    {
+    private:
+        static constexpr bool __store_size =
+            _Kind == subrange_kind::sized && !SizedSentinel<_Sent, _Iter>;
+        using __base_t = __subrange_base<_Iter, __store_size>;
+
+        _Iter __begin_ = _Iter();
+        _Sent __end_ = _Sent();
+
+        constexpr iter_difference_t<_Iter> __size(false_type) const
+        _NOEXCEPT(noexcept(__end_ - __begin_))
+        { return __end_ - __begin_; }
+        constexpr iter_difference_t<_Iter> __size(true_type) const _NOEXCEPT
+        { return this->__size_; }
+    public:
+        subrange() = default;
+        constexpr subrange(_Iter __i, _Sent __s) requires (!__store_size)
+            _NOEXCEPT_(is_nothrow_move_constructible_v<_Iter> &&
+                is_nothrow_move_constructible_v<_Sent>) // strengthened
+            : __begin_(std::move(__i)), __end_(std::move(__s)) {}
+        constexpr subrange(_Iter __i, _Sent __s, iter_difference_t<_Iter> __n)
+            _NOEXCEPT_(is_nothrow_move_constructible_v<_Iter> &&
+                is_nothrow_move_constructible_v<_Sent>) // strengthened
+            requires _Kind == subrange_kind::sized
+            : __base_t{__n}, __begin_(std::move(__i)), __end_(std::move(__s)) {}
+
+        template <__not_same_as<subrange> _Rp>
+        requires __forwarding_range<_Rp> &&
+            ConvertibleTo<iterator_t<_Rp>, _Iter> && ConvertibleTo<sentinel_t<_Rp>, _Sent>
+        constexpr subrange(_Rp&& __r) requires !__store_size || SizedRange<_Rp>
+            _NOEXCEPT_(noexcept(_VSTD::__test_convert<_Iter>(_VSTD::ranges::begin(__r)))
+                && noexcept(_VSTD::__test_convert<_Sent>(_VSTD::ranges::end(__r)))) // strengthened
+            : __begin_(_VSTD::ranges::begin(__r)), __end_(_VSTD::ranges::end(__r)) {}
+        template <__forwarding_range _Rp>
+        requires ConvertibleTo<iterator_t<_Rp>, _Iter> && ConvertibleTo<sentinel_t<_Rp>, _Sent>
+        constexpr subrange(_Rp&& __r, iter_difference_t<_Iter> __n)
+        requires _Kind == subrange_kind::sized
+            _NOEXCEPT_(noexcept(_VSTD::__test_convert<_Iter>(_VSTD::ranges::begin(__r)))
+                && noexcept(_VSTD::__test_convert<_Sent>(_VSTD::ranges::end(__r)))) // strengthened
+            : __base_t{__n},
+            , __begin_(_VSTD::ranges::begin(__r)), __end_(_VSTD::ranges::end(__r)) {}
+
+        template <__not_same_as<subrange> _PairLike>
+        requires __pair_like_convertible_to<_PairLike, _Iter, _Sent>
+        constexpr subrange(_PairLike&& __r) requires !__store_size
+            _NOEXCEPT_(noexcept(_VSTD::__test_convert<_Iter>(_VSTD::get<0>(_VSTD::forward<_PairLike>(__r))))
+                && noexcept(_VSTD::__test_convert<_Sent>(_VSTD::get<1>(_VSTD::forward<_PairLike>(__r))))) // strengthened
+            : __begin_(_VSTD::get<0>(_VSTD::forward<_PairLike>(__r)))
+            , __end_(_VSTD::get<1>(_VSTD::forward<_PairLike>(__r))) {}
+        template <__pair_like_convertible_to<_Iter, _Sent> _PairLike>
+        constexpr subrange(_PairLike&& __r, iter_difference_t<_Iter> __n)
+        requires _Kind == subrange_kind::sized
+            _NOEXCEPT_(noexcept(_VSTD::__test_convert<_Iter>(_VSTD::get<0>(_VSTD::forward<_PairLike>(__r))))
+                && noexcept(_VSTD::__test_convert<_Sent>(_VSTD::get<1>(_VSTD::forward<_PairLike>(__r))))) // strengthened
+            : __base_t{__n}
+            , __begin_(_VSTD::get<0>(_VSTD::forward<_PairLike>(__r)))
+            , __end_(_VSTD::get<1>(_VSTD::forward<_PairLike>(__r))) {}
+
+        template <__not_same_as<subrange> _PairLike>
+        requires __pair_like_convertible_from<_PairLike, const _Iter&, const _Sent&>
+        constexpr operator _PairLike() const
+        _NOEXCEPT_(noexcept(_PairLike(__begin_, __end_))) // strengthened
+        { return _PairLike(__begin_, __end_); }
+
+        constexpr _Iter begin() const
+        _NOEXCEPT_(is_nothrow_copy_constructible_v<_Iter>) // strengthened
+        { return __begin_; }
+        constexpr _Sent end() const
+        _NOEXCEPT_(is_nothrow_copy_constructible_v<_Sent>) // strengthened
+        { return __end_; }
+        friend constexpr _Iter begin(subrange __r)
+        _NOEXCEPT_(noexcept(__r.begin())) // strengthened
+        { return __r.begin(); }
+        friend constexpr _Sent end(subrange __r)
+        _NOEXCEPT_(noexcept(__r.end())) // strengthened
+        { return __r.end(); }
+
+        constexpr bool empty() const
+        _NOEXCEPT_(noexcept(_VSTD::__test_convert<bool>(__begin_ == __end_))) // strengthened
+        { return __begin == __end_; }
+
+        constexpr iter_difference_t<_Iter> size() const
+        requires _Kind == subrange_kind::sized
+        _NOEXCEPT_(noexcept(__size(bool_constant<__store_size>{}))) // strengthened
+        { return __size(bool_constant<__store_size>{}); }
+
+        [[nodiscard]] constexpr subrange next(iter_difference_t<_Iter> __n = 1) const
+        {
+            auto __tmp = *this;
+            __tmp.advance(__n);
+            return __tmp;
+        }
+        [[nodiscard]] constexpr subrange prev(iter_difference_t<_Iter> __n = 1) const
+        requires BidirectionalIterator<_Iter>
+        {
+            auto __tmp = *this;
+            __tmp.advance(-__n);
+            return __tmp;
+        }
+        constexpr subrange& advance(iter_difference_t<_Iter> __n) {
+            const auto __rem = _VSTD::ranges::advance(__begin_, __n, __end_);
+            if constexpr (__store_size) this->__size_ -= __n - __rem;
+            return *this;
+        }
+    };
+
+    template <Iterator _Iter, Sentinel<_Iter> _Sent>
+    subrange(_Iter, _Sent, iter_difference_t<_Iter>) ->
+        subrange<_Iter, _Sent, subrange_kind::sized>;
+
+    template <__iterator_sentinel_pair P>
+    subrange(P) -> subrange<tuple_element_t<0, P>, tuple_element_t<1, P>>;
+
+    template <__iterator_sentinel_pair P>
+    subrange(P, iter_difference_t<tuple_element_t<0, P>>) ->
+        subrange<tuple_element_t<0, P>, tuple_element_t<1, P>, subrange_kind::sized>;
+
+    template <__forwarding_range _Rp>
+    subrange(_Rp&&) -> subrange<iterator_t<_Rp>, sentinel_t<_Rp>,
+        (SizedRange<_Rp> || SizedSentinel<sentinel_t<_Rp>, iterator_t<_Rp>>)
+            ? subrange_kind::sized : subrange_kind::unsized>;
+
+    template <__forwarding_range _Rp>
+    subrange(_Rp&&, iter_difference_t<iterator_t<_Rp>>) ->
+        subrange<iterator_t<_Rp>, sentinel_t<_Rp>, subrange_kind::sized>;
+
+    template <size_t _Idx, class _Iter, class _Sent, subrange_kind _Kind>
+    requires _Idx < 2
+    constexpr auto get(const subrange<_Iter, _Sent, _Kind>& __r)
+    _NOEXCEPT_(is_nothrow_copy_constructible_v<conditional_t<_Idx == 0, _Iter, _Sent>>)
+    {
+        if constexpr (_Idx == 0) return __r.__begin_;
+        else return __r.__end_;
+    }
+
+    template <__forwarding_range _Rp>
+    using safe_subrange_t = subrange<iterator_t<_Rp>>;
+} // namespace ranges
+
+_LIBCPP_END_NAMESPACE_STD
+
+#endif  // defined(_LIBCPP_HAS_NO_CONCEPTS) || _LIBCPP_STD_VER <= 17
+
+_LIBCPP_POP_MACROS
+
+#endif  // _LIBCPP_RANGES
