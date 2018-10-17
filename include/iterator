@@ -1069,6 +1069,7 @@ _LIBCPP_CONCEPT_DECL _Cpp17InputIterator =
 template <class _Iter>
 _LIBCPP_CONCEPT_DECL _Cpp17ForwardIterator =
     _Cpp17InputIterator<_Iter> && Constructible<_Iter> &&
+    is_lvalue_reference_v<iter_reference_t<_Iter>> &&
     Same<remove_cvref_t<iter_reference_t<_Iter>>,
         typename readable_traits<_Iter>::value_type> &&
     requires(_Iter __i) {
