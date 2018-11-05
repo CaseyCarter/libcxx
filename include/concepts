@@ -271,9 +271,12 @@ namespace ranges
         void swap(_Tp(&)[_Size], _Tp(&)[_Size]) = delete;
 
         template <class _Tp, class _Up>
-        _LIBCPP_CONCEPT_DECL __has_adl = requires(_Tp&& __t, _Up&& __u) {
-            swap(static_cast<_Tp&&>(__t), static_cast<_Up&&>(__u));
-        };
+        _LIBCPP_CONCEPT_DECL __has_adl =
+            (is_class_v<remove_reference_t<_Tp>> ||
+             is_class_v<remove_reference_t<_Up>>) &&
+            requires(_Tp&& __t, _Up&& __u) {
+                swap(static_cast<_Tp&&>(__t), static_cast<_Up&&>(__u));
+            };
 
         struct __fn
         {
@@ -286,7 +289,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_adl<_Tp&, _Tp&> && MoveConstructible<_Tp> &&
+            requires (!__has_adl<_Tp&, _Tp&>) && MoveConstructible<_Tp> &&
                 Assignable<_Tp&, _Tp>
             constexpr void operator()(_Tp& __x, _Tp& __y) const
                 _NOEXCEPT_(is_nothrow_move_constructible_v<_Tp> &&
@@ -298,8 +301,7 @@ namespace ranges
             }
 
             template <class _Tp, class _Up, size_t _Size, class _Fn = __fn>
-            requires !__has_adl<_Tp(&)[_Size], _Up(&)[_Size]> &&
-                Invocable<const _Fn&, _Tp&, _Up&>
+            requires Invocable<const _Fn&, _Tp&, _Up&>
             constexpr void operator()(_Tp(&__t)[_Size], _Up(&__u)[_Size]) const
                 _NOEXCEPT_(_NOEXCEPT_(_VSTD::declval<const _Fn&>()(*__t, *__u)))
             {
