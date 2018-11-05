@@ -101,7 +101,7 @@ namespace std::ranges {
   // 23.7.3.1
   enum class subrange_kind : bool { unsized, sized };
   template <Iterator I, Sentinel<I> S = I, subrange_kind K = see below>
-    requires K == subrange_kind::sized || !SizedSentinel<S, I>
+    requires (K == subrange_kind::sized || !SizedSentinel<S, I>)
       class subrange;
 
   // 23.8.4
@@ -125,7 +125,7 @@ namespace std::ranges {
 
   // 23.8.9
   template <WeaklyIncrementable I, Semiregular Bound = unreachable>
-    requires weakly-equality-comparable-with <I, Bound>
+    requires weakly-equality-comparable-with<I, Bound>
       class iota_view;
 
   namespace view { inline constexpr unspecified iota = unspecified; }
@@ -170,7 +170,7 @@ namespace std::ranges {
   template <InputRange Rng, ForwardRange Pattern>
     requires View<Rng> && View<Pattern> &&
         IndirectlyComparable<iterator_t<Rng>, iterator_t<Pattern>, ranges::equal_to<>> &&
-        (ForwardRange<Rng> || tiny-range <Pattern>)
+        (ForwardRange<Rng> || tiny-range<Pattern>)
       class split_view;
 
   namespace view { inline constexpr unspecified split = unspecified; }
@@ -180,7 +180,7 @@ namespace std::ranges {
 
   // 23.8.21
   template <View Rng>
-    requires !CommonRange<Rng>
+    requires (!CommonRange<Rng>)
       class common_view;
 
   namespace view { inline constexpr unspecified common = unspecified; }
@@ -464,20 +464,20 @@ namespace ranges {
         constexpr subrange(_Iter __i, _Sent __s, iter_difference_t<_Iter> __n)
             _NOEXCEPT_(is_nothrow_move_constructible_v<_Iter> &&
                 is_nothrow_move_constructible_v<_Sent>) // strengthened
-            requires _Kind == subrange_kind::sized
+            requires (_Kind == subrange_kind::sized)
             : __base_t{__n}, __begin_(std::move(__i)), __end_(std::move(__s)) {}
 
         template <__not_same_as<subrange> _Rp>
         requires __forwarding_range<_Rp> &&
             ConvertibleTo<iterator_t<_Rp>, _Iter> && ConvertibleTo<sentinel_t<_Rp>, _Sent>
-        constexpr subrange(_Rp&& __r) requires !__store_size || SizedRange<_Rp>
+        constexpr subrange(_Rp&& __r) requires (!__store_size) || SizedRange<_Rp>
             _NOEXCEPT_(noexcept(_VSTD::__test_convert<_Iter>(_VSTD::ranges::begin(__r)))
                 && noexcept(_VSTD::__test_convert<_Sent>(_VSTD::ranges::end(__r)))) // strengthened
             : __begin_(_VSTD::ranges::begin(__r)), __end_(_VSTD::ranges::end(__r)) {}
         template <__forwarding_range _Rp>
         requires ConvertibleTo<iterator_t<_Rp>, _Iter> && ConvertibleTo<sentinel_t<_Rp>, _Sent>
         constexpr subrange(_Rp&& __r, iter_difference_t<_Iter> __n)
-        requires _Kind == subrange_kind::sized
+        requires (_Kind == subrange_kind::sized)
             _NOEXCEPT_(noexcept(_VSTD::__test_convert<_Iter>(_VSTD::ranges::begin(__r)))
                 && noexcept(_VSTD::__test_convert<_Sent>(_VSTD::ranges::end(__r)))) // strengthened
             : __base_t{__n},
@@ -485,14 +485,14 @@ namespace ranges {
 
         template <__not_same_as<subrange> _PairLike>
         requires __pair_like_convertible_to<_PairLike, _Iter, _Sent>
-        constexpr subrange(_PairLike&& __r) requires !__store_size
+        constexpr subrange(_PairLike&& __r) requires (!__store_size)
             _NOEXCEPT_(noexcept(_VSTD::__test_convert<_Iter>(_VSTD::get<0>(_VSTD::forward<_PairLike>(__r))))
                 && noexcept(_VSTD::__test_convert<_Sent>(_VSTD::get<1>(_VSTD::forward<_PairLike>(__r))))) // strengthened
             : __begin_(_VSTD::get<0>(_VSTD::forward<_PairLike>(__r)))
             , __end_(_VSTD::get<1>(_VSTD::forward<_PairLike>(__r))) {}
         template <__pair_like_convertible_to<_Iter, _Sent> _PairLike>
         constexpr subrange(_PairLike&& __r, iter_difference_t<_Iter> __n)
-        requires _Kind == subrange_kind::sized
+        requires (_Kind == subrange_kind::sized)
             _NOEXCEPT_(noexcept(_VSTD::__test_convert<_Iter>(_VSTD::get<0>(_VSTD::forward<_PairLike>(__r))))
                 && noexcept(_VSTD::__test_convert<_Sent>(_VSTD::get<1>(_VSTD::forward<_PairLike>(__r))))) // strengthened
             : __base_t{__n}
@@ -523,7 +523,7 @@ namespace ranges {
         { return __begin == __end_; }
 
         constexpr iter_difference_t<_Iter> size() const
-        requires _Kind == subrange_kind::sized
+        requires (_Kind == subrange_kind::sized)
         _NOEXCEPT_(noexcept(__size(bool_constant<__store_size>{}))) // strengthened
         { return __size(bool_constant<__store_size>{}); }
 
@@ -568,7 +568,7 @@ namespace ranges {
         subrange<iterator_t<_Rp>, sentinel_t<_Rp>, subrange_kind::sized>;
 
     template <size_t _Idx, class _Iter, class _Sent, subrange_kind _Kind>
-    requires _Idx < 2
+    requires (_Idx < 2)
     constexpr auto get(const subrange<_Iter, _Sent, _Kind>& __r)
     _NOEXCEPT_(is_nothrow_copy_constructible_v<conditional_t<_Idx == 0, _Iter, _Sent>>)
     {

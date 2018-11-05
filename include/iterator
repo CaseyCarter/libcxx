@@ -529,10 +529,10 @@ _LIBCPP_CONCEPT_DECL __can_difference =
     };
 
 template <class _Tp>
-requires !__has_member_difference_type<_Tp> &&
+requires (!__has_member_difference_type<_Tp>) &&
 #if !defined(__clang__) && defined(__GNUC__)
     // workaround https://gcc.gnu.org/bugzilla/show_bug.cgi?id=78173
-    !is_pointer_v<_Tp> &&
+    (!is_pointer_v<_Tp>) &&
 #endif
     __can_difference<_Tp>
 struct _LIBCPP_TEMPLATE_VIS incrementable_traits<_Tp>
@@ -638,7 +638,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_adl<_Tp> &&
+            requires (!__has_adl<_Tp>) &&
                 requires(_Tp&& __t) { *static_cast<_Tp&&>(__t); }
             constexpr decltype(auto) operator()(_Tp&& __t) const
                 _NOEXCEPT_(noexcept(*static_cast<_Tp&&>(__t)))
@@ -758,7 +758,7 @@ struct __iter_concept_<_Iter, false>
 };
 
 template <class _Iter>
-requires !__has_member_iter_concept<iterator_traits<_Iter>> &&
+requires (!__has_member_iter_concept<iterator_traits<_Iter>>) &&
     __has_member_category<iterator_traits<_Iter>>
 struct __iter_concept_<_Iter, false>
 {
@@ -778,7 +778,7 @@ struct __iter_concept_<_Iter, true>
 };
 
 template <class _Iter>
-requires !__has_member_iter_concept<_Iter> && __has_member_category<_Iter>
+requires (!__has_member_iter_concept<_Iter>) && __has_member_category<_Iter>
 struct __iter_concept_<_Iter, true>
 {
     using type = typename _Iter::iterator_category;
@@ -971,7 +971,7 @@ namespace ranges
             }
 
             template <class _Tp, class _Up>
-            requires !__has_adl<_Tp, _Up> && __can_swap_references<_Tp, _Up>
+            requires (!__has_adl<_Tp, _Up>) && __can_swap_references<_Tp, _Up>
             constexpr void operator()(_Tp&& __t, _Up&& __u) const
                 _NOEXCEPT_(noexcept(swap(
                     *static_cast<_Tp&&>(__t), *static_cast<_Up&&>(__u))))
@@ -980,7 +980,7 @@ namespace ranges
             }
 
             template <class _Tp, class _Up>
-            requires !__has_adl<_Tp, _Up> && !__can_swap_references<_Tp, _Up> &&
+            requires (!__has_adl<_Tp, _Up>) && (!__can_swap_references<_Tp, _Up>) &&
                 IndirectlyMovableStorable<
                     remove_reference_t<_Tp>, remove_reference_t<_Up>> &&
                 IndirectlyMovableStorable<
@@ -1002,11 +1002,11 @@ namespace ranges
 template <class _Iter1, class _Iter2 = _Iter1>
 _LIBCPP_CONCEPT_DECL IndirectlySwappable =
     Readable<_Iter1> && Readable<_Iter2> &&
-    requires(_Iter1&& __i1, _Iter2&& __i2) {
-        _VSTD::ranges::iter_swap(static_cast<_Iter1&&>(__i1), static_cast<_Iter2&&>(__i2));
-        _VSTD::ranges::iter_swap(static_cast<_Iter2&&>(__i2), static_cast<_Iter1&&>(__i1));
-        _VSTD::ranges::iter_swap(static_cast<_Iter1&&>(__i1), static_cast<_Iter1&&>(__i1));
-        _VSTD::ranges::iter_swap(static_cast<_Iter2&&>(__i2), static_cast<_Iter2&&>(__i2));
+    requires(_Iter1& __i1, _Iter2& __i2) {
+        _VSTD::ranges::iter_swap(__i1, __i1);
+        _VSTD::ranges::iter_swap(__i2, __i2);
+        _VSTD::ranges::iter_swap(__i1, __i2);
+        _VSTD::ranges::iter_swap(__i2, __i1);
     };
 
 template <class _Iter1, class _Iter2, class _Rel,
@@ -1180,7 +1180,7 @@ struct _LIBCPP_TEMPLATE_VIS __iter_traits_category<true>
 };
 
 template <class _Iter>
-requires !__has_iter_types<_Iter> && _Cpp17InputIterator<_Iter>
+requires (!__has_iter_types<_Iter>) && _Cpp17InputIterator<_Iter>
 struct _LIBCPP_TEMPLATE_VIS iterator_traits<_Iter>
 {
     using difference_type = typename incrementable_traits<_Iter>::difference_type;
@@ -1205,7 +1205,7 @@ struct _LIBCPP_TEMPLATE_VIS __iter_traits_difference<true>
 };
 
 template <class _Iter>
-requires !__has_iter_types<_Iter> && _Cpp17Iterator<_Iter>
+requires (!__has_iter_types<_Iter>) && _Cpp17Iterator<_Iter>
 struct _LIBCPP_TEMPLATE_VIS iterator_traits<_Iter>
 {
     using difference_type   = __apply<__iter_traits_difference<__has_member_difference_type<incrementable_traits<_Iter>>>, _Iter>;
@@ -1256,7 +1256,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_member<_Tp> && __has_adl<_Tp>
+            requires (!__has_member<_Tp>) && __has_adl<_Tp>
             constexpr auto operator()(_Tp&& __t) const
                 _NOEXCEPT_(noexcept(_VSTD::__test_convert(begin(static_cast<_Tp&&>(__t)))))
             {
@@ -1309,7 +1309,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_member<_Tp> && __has_adl<_Tp>
+            requires (!__has_member<_Tp>) && __has_adl<_Tp>
             constexpr auto operator()(_Tp&& __t) const
                 _NOEXCEPT_(noexcept(_VSTD::__test_convert(end(static_cast<_Tp&&>(__t)))))
             {
@@ -1402,7 +1402,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_member<_Tp> && __has_adl<_Tp>
+            requires (!__has_member<_Tp>) && __has_adl<_Tp>
             constexpr auto operator()(_Tp& __t) const
                 _NOEXCEPT_(noexcept(_VSTD::__test_convert(rbegin(static_cast<_Tp&&>(__t)))))
             {
@@ -1410,7 +1410,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_member<_Tp> && !__has_adl<_Tp> &&
+            requires (!__has_member<_Tp>) && (!__has_adl<_Tp>) &&
                 requires(_Tp&& __t) {
                     { begin(static_cast<_Tp&&>(__t)) } -> BidirectionalIterator;
                     { end(static_cast<_Tp&&>(__t)) } ->
@@ -1460,7 +1460,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_member<_Tp> && __has_adl<_Tp>
+            requires (!__has_member<_Tp>) && __has_adl<_Tp>
             constexpr auto operator()(_Tp& __t) const
                 _NOEXCEPT_(noexcept(_VSTD::__test_convert(rend(static_cast<_Tp&&>(__t)))))
             {
@@ -1468,7 +1468,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_member<_Tp> && !__has_adl<_Tp> &&
+            requires (!__has_member<_Tp>) && (!__has_adl<_Tp>) &&
                 requires(_Tp&& __t) {
                     { begin(static_cast<_Tp&&>(__t)) } -> BidirectionalIterator;
                     { end(static_cast<_Tp&&>(__t)) } ->
@@ -1558,7 +1558,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_member<_Tp> && __has_adl<_Tp>
+            requires (!__has_member<_Tp>) && __has_adl<_Tp>
             constexpr auto operator()(_Tp&& __t) const
                 _NOEXCEPT_(noexcept(_VSTD::__test_convert(size(static_cast<_Tp&&>(__t)))))
             {
@@ -1566,7 +1566,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_member<_Tp> && __has_adl<_Tp> && requires(_Tp&& __t) {
+            requires (!__has_member<_Tp>) && __has_adl<_Tp> && requires(_Tp&& __t) {
                 begin(__t); // FIXME: specify this lvalue treatment
                 end(__t); // FIXME: specify this lvalue treatment
                 requires ForwardIterator<decltype(begin(__t))>;
@@ -1608,7 +1608,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_member<_Tp> && __has_size<_Tp>
+            requires (!__has_member<_Tp>) && __has_size<_Tp>
             constexpr bool operator()(_Tp&& __t) const
                 _NOEXCEPT_(noexcept(size(static_cast<_Tp&&>(__t))))
             {
@@ -1616,7 +1616,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_member<_Tp> && !__has_size<_Tp> && requires(_Tp&& __t) {
+            requires (!__has_member<_Tp>) && (!__has_size<_Tp>) && requires(_Tp&& __t) {
                 begin(__t); // FIXME: specify this lvalue treatment
                 end(__t); // FIXME: specify this lvalue treatment
                 requires ForwardIterator<decltype(begin(__t))>;
@@ -1665,7 +1665,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_member<_Tp> && __has_pointer_begin<_Tp>
+            requires (!__has_member<_Tp>) && __has_pointer_begin<_Tp>
             constexpr auto operator()(_Tp&& __t) const
                 _NOEXCEPT_(noexcept(begin(static_cast<_Tp&&>(__t))))
             {
@@ -1673,7 +1673,7 @@ namespace ranges
             }
 
             template <class _Tp>
-            requires !__has_member<_Tp> && !__has_pointer_begin<_Tp> &&
+            requires (!__has_member<_Tp>) && (!__has_pointer_begin<_Tp>) &&
                 requires(_Tp&& __t) {
                     begin(__t); // FIXME: specify this lvalue treatment
                     end(__t); // FIXME: specify this lvalue treatment
@@ -2188,7 +2188,7 @@ public:
 
 #ifdef _LIBCPP_HAS_RANGES
 template <class _Iter1, class _Iter2>
-requires !SizedSentinel<_Iter1, _Iter2>
+requires (!SizedSentinel<_Iter1, _Iter2>)
 inline constexpr bool disable_sized_sentinel<
     reverse_iterator<_Iter1>, reverse_iterator<_Iter2>> = true;
 #endif
@@ -2931,7 +2931,7 @@ public:
 namespace __common_iterator_detail
 {
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires !Same<_Iter, _Sent>
+    requires (!Same<_Iter, _Sent>)
     struct __variant_ish1
     {
         union {
@@ -2966,7 +2966,7 @@ namespace __common_iterator_detail
     };
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires !Same<_Iter, _Sent> &&
+    requires (!Same<_Iter, _Sent>) &&
         is_trivially_destructible_v<_Iter> &&
         is_trivially_destructible_v<_Sent>
     struct __variant_ish1<_Iter, _Sent>
@@ -2993,7 +2993,7 @@ namespace __common_iterator_detail
     };
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires !Same<_Iter, _Sent>
+    requires (!Same<_Iter, _Sent>)
     struct __variant_ish2 : __variant_ish1<_Iter, _Sent>
     {
         using __variant_ish1<_Iter, _Sent>::__variant_ish1;
@@ -3016,7 +3016,7 @@ namespace __common_iterator_detail
     };
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires !Same<_Iter, _Sent>
+    requires (!Same<_Iter, _Sent>)
     struct __variant_ish3_ : __variant_ish1<_Iter, _Sent>
     {
         using __variant_ish1<_Iter, _Sent>::__variant_ish1;
@@ -3044,7 +3044,7 @@ namespace __common_iterator_detail
     };
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires !Same<_Iter, _Sent>
+    requires (!Same<_Iter, _Sent>)
     using __variant_ish3 = __select<
         is_trivially_copy_constructible_v<_Iter> &&
         is_trivially_copy_constructible_v<_Sent> &&
@@ -3053,7 +3053,7 @@ namespace __common_iterator_detail
         __variant_ish2<_Iter, _Sent>, __variant_ish3_<_Iter, _Sent>>;
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires !Same<_Iter, _Sent>
+    requires (!Same<_Iter, _Sent>)
     struct __variant_ish4_ : __variant_ish3<_Iter, _Sent>
     {
         using __variant_ish1<_Iter, _Sent>::__variant_ish1;
@@ -3097,7 +3097,7 @@ namespace __common_iterator_detail
     };
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires !Same<_Iter, _Sent>
+    requires (!Same<_Iter, _Sent>)
     using __variant_ish = __select<
         is_trivially_copy_assignable_v<_Iter> &&
         is_trivially_copy_assignable_v<_Sent> &&
@@ -3121,7 +3121,7 @@ namespace __common_iterator_detail
 }
 
 template <Iterator _Iter, Sentinel<_Iter> _Sent>
-requires !Same<_Iter, _Sent>
+requires (!Same<_Iter, _Sent>)
 class common_iterator
 {
 public: /* FIXME: private: */
