@@ -488,7 +488,7 @@ using __select = __apply<__select_<_Cond>, _Tp, _Fp>;
 template <class _Tp> using __reference_to = _Tp&;
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __can_reference = // FIXME: specify this
+_LIBCPP_CONCEPT_DECL __can_reference =
     requires { typename __reference_to<_Tp>; };
 
 template <class _Tp>
@@ -1567,8 +1567,8 @@ namespace ranges
 
             template <class _Tp>
             requires (!__has_member<_Tp>) && __has_adl<_Tp> && requires(_Tp&& __t) {
-                begin(__t); // FIXME: specify this lvalue treatment
-                end(__t); // FIXME: specify this lvalue treatment
+                begin(__t);
+                end(__t);
                 requires ForwardIterator<decltype(begin(__t))>;
                 requires SizedSentinel<decltype(end(__t)), decltype(begin(__t))>;
             }
@@ -1617,8 +1617,8 @@ namespace ranges
 
             template <class _Tp>
             requires (!__has_member<_Tp>) && (!__has_size<_Tp>) && requires(_Tp&& __t) {
-                begin(__t); // FIXME: specify this lvalue treatment
-                end(__t); // FIXME: specify this lvalue treatment
+                begin(__t);
+                end(__t);
                 requires ForwardIterator<decltype(begin(__t))>;
             }
             constexpr bool operator()(_Tp&& __t) const
@@ -1675,8 +1675,8 @@ namespace ranges
             template <class _Tp>
             requires (!__has_member<_Tp>) && (!__has_pointer_begin<_Tp>) &&
                 requires(_Tp&& __t) {
-                    begin(__t); // FIXME: specify this lvalue treatment
-                    end(__t); // FIXME: specify this lvalue treatment
+                    begin(__t);
+                    end(__t);
                     requires ContiguousIterator<decltype(begin(__t))>;
                 }
             constexpr auto operator()(_Tp&& __t) const
@@ -3127,7 +3127,6 @@ template <Iterator _Iter, Sentinel<_Iter> _Sent>
 requires (!Same<_Iter, _Sent>)
 class common_iterator
 {
-public: /* FIXME: private: */
     using _Variant = __common_iterator_detail::__variant_ish<_Iter, _Sent>;
     _Variant __v_{in_place_index<1>};
 
