@@ -2930,8 +2930,11 @@ public:
 
 namespace __common_iterator_detail
 {
+    template <class T, class U>
+    _LIBCPP_CONCEPT_DECL __different = !Same<T, U>;
+
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires (!Same<_Iter, _Sent>)
+    requires __different<_Iter, _Sent>
     struct __variant_ish1
     {
         union {
@@ -2966,7 +2969,7 @@ namespace __common_iterator_detail
     };
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires (!Same<_Iter, _Sent>) &&
+    requires __different<_Iter, _Sent> &&
         is_trivially_destructible_v<_Iter> &&
         is_trivially_destructible_v<_Sent>
     struct __variant_ish1<_Iter, _Sent>
@@ -2993,7 +2996,7 @@ namespace __common_iterator_detail
     };
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires (!Same<_Iter, _Sent>)
+    requires __different<_Iter, _Sent>
     struct __variant_ish2 : __variant_ish1<_Iter, _Sent>
     {
         using __variant_ish1<_Iter, _Sent>::__variant_ish1;
@@ -3016,7 +3019,7 @@ namespace __common_iterator_detail
     };
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires (!Same<_Iter, _Sent>)
+    requires __different<_Iter, _Sent>
     struct __variant_ish3_ : __variant_ish1<_Iter, _Sent>
     {
         using __variant_ish1<_Iter, _Sent>::__variant_ish1;
@@ -3044,7 +3047,7 @@ namespace __common_iterator_detail
     };
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires (!Same<_Iter, _Sent>)
+    requires __different<_Iter, _Sent>
     using __variant_ish3 = __select<
         is_trivially_copy_constructible_v<_Iter> &&
         is_trivially_copy_constructible_v<_Sent> &&
@@ -3053,7 +3056,7 @@ namespace __common_iterator_detail
         __variant_ish2<_Iter, _Sent>, __variant_ish3_<_Iter, _Sent>>;
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires (!Same<_Iter, _Sent>)
+    requires __different<_Iter, _Sent>
     struct __variant_ish4_ : __variant_ish3<_Iter, _Sent>
     {
         using __variant_ish1<_Iter, _Sent>::__variant_ish1;
@@ -3097,7 +3100,7 @@ namespace __common_iterator_detail
     };
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
-    requires (!Same<_Iter, _Sent>)
+    requires __different<_Iter, _Sent>
     using __variant_ish = __select<
         is_trivially_copy_assignable_v<_Iter> &&
         is_trivially_copy_assignable_v<_Sent> &&
