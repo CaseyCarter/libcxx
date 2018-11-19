@@ -3557,8 +3557,7 @@ public:
     typedef typename iterator_traits<iterator_type>::pointer           pointer;
     typedef typename iterator_traits<iterator_type>::reference         reference;
 #ifdef _LIBCPP_HAS_RANGES
-    using iterator_concept =
-        __select<ContiguousIterator<_Iter>, contiguous_iterator_tag, iterator_category>;
+    typedef contiguous_iterator_tag iterator_concept;
 #endif
 private:
     iterator_type __i;
@@ -3574,7 +3573,7 @@ public:
     }
     template <class _Up> _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_IF_NODEBUG
         __wrap_iter(const __wrap_iter<_Up>& __u,
-            typename enable_if<is_convertible<_Up, iterator_type>::value>::type* = 0) _NOEXCEPT_DEBUG
+            typename enable_if<is_convertible<const _Up&, iterator_type>::value>::type* = 0) _NOEXCEPT_DEBUG
             : __i(__u.base())
     {
 #if _LIBCPP_DEBUG_LEVEL >= 2
