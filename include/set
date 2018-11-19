@@ -1390,7 +1390,7 @@ swap(multiset<_Key, _Compare, _Allocator>& __x,
     __x.swap(__y);
 }
 
-#if _LIBCPP_HAS_RANGES
+#ifdef _LIBCPP_HAS_RANGES
 namespace ranges {
 template <class> struct enable_view;
 template <class _Key, class _Compare, class _Allocator>
