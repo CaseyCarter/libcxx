@@ -53,6 +53,11 @@ namespace std
       concept Assignable = see below;
 
     // [concept.swappable], concept Swappable
+    namespace ranges {
+      inline namespace unspecified {
+        inline constexpr unspecified swap = unspecified;
+      }
+    }
     template<class T>
       concept Swappable = see below;
     template<class T, class U>
