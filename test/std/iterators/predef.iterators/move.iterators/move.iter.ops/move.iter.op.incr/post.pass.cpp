@@ -26,12 +26,12 @@ void
 test(It i, It x)
 {
     std::move_iterator<It> r(i);
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     if constexpr (std::ForwardIterator<It>) {
 #endif
         std::move_iterator<It> rr = r++;
         assert(rr.base() == i);
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     } else {
         r++;
     }

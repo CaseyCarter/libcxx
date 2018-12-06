@@ -17,7 +17,7 @@
 template <class C>
 void test_contiguous ( const C &c )
 {
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     static_assert(std::ContiguousIterator<typename C::iterator>);
     static_assert(std::ContiguousIterator<typename C::const_iterator>);
 #endif

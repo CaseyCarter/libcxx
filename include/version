@@ -113,11 +113,9 @@ __cpp_lib_void_t                            201411L <type_traits>
 # define __cpp_lib_node_extract                         201606L
 #endif
 
-#if _LIBCPP_STD_VER > 17
-# if !defined(_LIBCPP_HAS_NO_CONCEPTS)
-#  define __cpp_lib_concepts 201806L
-#  define __cpp_lib_ranges 201811L
-# endif
+#if _STL_HAS_CONCEPTS && _LIBCPP_STD_VER > 17
+# define __cpp_lib_concepts 201806L
+# define __cpp_lib_ranges 201811L
 #endif
 
 #endif  // _LIBCPP_VERSIONH

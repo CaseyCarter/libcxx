@@ -15,10 +15,10 @@
 #include <__config>
 
 template <class, class>
-_LIBCPP_CONCEPT_DECL C1 = true;
+_STL_CONCEPT_DECL C1 = true;
 
 template <class>
-_LIBCPP_CONCEPT_DECL C2 = requires { { 42 } -> C1<int>; };
+_STL_CONCEPT_DECL C2 = requires { { 42 } -> C1<int>; };
 
 int main() {
     class A { int x; } a;

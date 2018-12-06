@@ -34,7 +34,7 @@ int main()
         assert ( !(ii1 != ii2 ));
         assert ( !(ii1 != cii ));
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
         static_assert(std::ContiguousIterator<C::iterator>);
         static_assert(std::ContiguousIterator<C::const_iterator>);
 #endif
@@ -51,7 +51,7 @@ int main()
         assert ( !(ii1 != ii2 ));
         assert ( !(ii1 != cii ));
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
         static_assert(std::ContiguousIterator<C::iterator>);
         static_assert(std::ContiguousIterator<C::const_iterator>);
 #endif
@@ -68,7 +68,7 @@ int main()
         assert ( !(ii1 != ii2 ));
         assert ( !(ii1 != cii ));
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
         static_assert(std::ContiguousIterator<C::iterator>);
         static_assert(std::ContiguousIterator<C::const_iterator>);
 #endif
@@ -85,7 +85,7 @@ int main()
         assert ( !(ii1 != ii2 ));
         assert ( !(ii1 != cii ));
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
         static_assert(std::ContiguousIterator<C::iterator>);
         static_assert(std::ContiguousIterator<C::const_iterator>);
 #endif

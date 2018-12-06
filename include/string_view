@@ -600,7 +600,7 @@ public:
     bool ends_with(const value_type* __s) const _NOEXCEPT
     { return ends_with(basic_string_view(__s)); }
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
     friend iterator begin(basic_string_view __s) _NOEXCEPT // strengthened
     { return __s.begin(); }
@@ -608,7 +608,7 @@ public:
     _LIBCPP_CONSTEXPR _LIBCPP_INLINE_VISIBILITY
     friend iterator end(basic_string_view __s) _NOEXCEPT // strengthened
     { return __s.end(); }
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 #endif // _LIBCPP_STD_VER > 17
 
 private:

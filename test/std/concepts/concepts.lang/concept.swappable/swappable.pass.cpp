@@ -106,7 +106,7 @@ int main() {
     }
     {
         // test that a deleted swap is correctly handled.
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
         test_swappable<MyNS::DeletedSwap>();
 #else
         test_not_swappable<MyNS::DeletedSwap>();
@@ -114,7 +114,7 @@ int main() {
     }
     {
         // test that a swap with ambiguous overloads is handled correctly.
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
         test_swappable<MyNS2::AmbiguousSwap>();
 #else
         test_not_swappable<MyNS2::AmbiguousSwap>();

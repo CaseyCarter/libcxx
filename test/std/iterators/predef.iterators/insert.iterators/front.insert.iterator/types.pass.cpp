@@ -48,7 +48,7 @@ test()
     q.test();
     static_assert((std::is_same<typename R::container_type, C>::value), "");
     static_assert((std::is_same<typename R::value_type, void>::value), "");
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     static_assert((std::is_same<typename R::difference_type, std::ptrdiff_t>::value), "");
 #else
     static_assert((std::is_same<typename R::difference_type, void>::value), "");

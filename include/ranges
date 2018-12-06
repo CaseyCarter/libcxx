@@ -223,13 +223,13 @@ namespace std {
 _LIBCPP_PUSH_MACROS
 #include <__undef_macros>
 
-#if defined(_LIBCPP_HAS_NO_CONCEPTS) || _LIBCPP_STD_VER <= 17
+#if !_STL_HAS_CONCEPTS || _LIBCPP_STD_VER <= 17
 # if defined(_LIBCPP_WARNING)
     _LIBCPP_WARNING("<ranges> requires compiler support for concepts and C++2a")
 # else
 #  warning <ranges> requires compiler support for concepts and C++2a
 # endif
-#else // defined(_LIBCPP_HAS_NO_CONCEPTS) || _LIBCPP_STD_VER <= 17
+#else // ^^^ No <ranges> support / <ranges> support vvv
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
@@ -257,35 +257,35 @@ namespace ranges {
         enable_view<_Tp>::type::value;
 
     template <class _Tp>
-    _LIBCPP_CONCEPT_DECL View =
+    _STL_CONCEPT_DECL View =
         Range<_Tp> && Semiregular<_Tp> && __view_predicate<_Tp>;
 
     template <class _Tp>
-    _LIBCPP_CONCEPT_DECL CommonRange =
+    _STL_CONCEPT_DECL CommonRange =
         Range<_Tp> && Same<iterator_t<_Tp>, sentinel_t<_Tp>>;
 
     template <class _Tp>
-    _LIBCPP_CONCEPT_DECL InputRange =
+    _STL_CONCEPT_DECL InputRange =
         Range<_Tp> && InputIterator<iterator_t<_Tp>>;
 
     template <class _Tp, class _Up>
-    _LIBCPP_CONCEPT_DECL OutputRange =
+    _STL_CONCEPT_DECL OutputRange =
         Range<_Tp> && OutputIterator<iterator_t<_Tp>, _Up>;
 
     template <class _Tp>
-    _LIBCPP_CONCEPT_DECL ForwardRange =
+    _STL_CONCEPT_DECL ForwardRange =
         InputRange<_Tp> && ForwardIterator<iterator_t<_Tp>>;
 
     template <class _Tp>
-    _LIBCPP_CONCEPT_DECL BidirectionalRange =
+    _STL_CONCEPT_DECL BidirectionalRange =
         ForwardRange<_Tp> && BidirectionalIterator<iterator_t<_Tp>>;
 
     template <class _Tp>
-    _LIBCPP_CONCEPT_DECL RandomAccessRange =
+    _STL_CONCEPT_DECL RandomAccessRange =
         BidirectionalRange<_Tp> && RandomAccessIterator<iterator_t<_Tp>>;
 
     template <class _Tp>
-    _LIBCPP_CONCEPT_DECL ContiguousRange =
+    _STL_CONCEPT_DECL ContiguousRange =
         RandomAccessRange<_Tp> && ContiguousIterator<iterator_t<_Tp>> &&
         requires(_Tp& __t) {
             _VSTD::ranges::data(__t);
@@ -293,7 +293,7 @@ namespace ranges {
         };
 
     template <class _Tp>
-    _LIBCPP_CONCEPT_DECL ViewableRange =
+    _STL_CONCEPT_DECL ViewableRange =
         Range<_Tp> && (__forwarding_range<_Tp> || View<remove_reference_t<_Tp>>);
 
     template <Range _Tp>
@@ -395,7 +395,7 @@ namespace ranges {
     enum class subrange_kind : bool { unsized, sized };
 
     template <class _Tp>
-    _LIBCPP_CONCEPT_DECL __pair_like =
+    _STL_CONCEPT_DECL __pair_like =
         requires(_Tp __t) {
             { tuple_size<_Tp>::value } -> Integral;
             requires tuple_size<_Tp>::value == 2;
@@ -405,23 +405,23 @@ namespace ranges {
             { _VSTD::get<1>(__t) } -> const tuple_element_t<1, _Tp>&;
         };
     template <class _Tp, class _Up, class _Vp>
-    _LIBCPP_CONCEPT_DECL __pair_like_convertible_to =
+    _STL_CONCEPT_DECL __pair_like_convertible_to =
         !Range<_Tp> && __pair_like<remove_cvref_t<_Tp>> &&
         requires(_Tp&& __t) {
             { _VSTD::get<0>(_VSTD::forward<_Tp>(__t)) } -> ConvertibleTo<_Up>;
             { _VSTD::get<1>(_VSTD::forward<_Tp>(__t)) } -> ConvertibleTo<_Vp>;
         };
     template <class _Tp, class _Up, class _Vp>
-    _LIBCPP_CONCEPT_DECL __pair_like_convertible_from =
+    _STL_CONCEPT_DECL __pair_like_convertible_from =
         !Range<_Tp> && Same<_Tp, remove_cvref_t<_Tp>> && __pair_like<_Tp> &&
         Constructible<_Tp, _Up, _Vp>;
     template <class _Tp>
-    _LIBCPP_CONCEPT_DECL __iterator_sentinel_pair =
+    _STL_CONCEPT_DECL __iterator_sentinel_pair =
         !Range<_Tp> && Same<_Tp, remove_cvref_t<_Tp>> && __pair_like<_Tp> &&
         Sentinel<tuple_element_t<1, _Tp>, tuple_element_t<0, _Tp>>;
 
     template <class _Tp, class _Up>
-    _LIBCPP_CONCEPT_DECL __not_same_as =
+    _STL_CONCEPT_DECL __not_same_as =
         !Same<remove_cvref_t<_Tp>, remove_cvref_t<_Up>>;
 
     template<class, bool> struct __subrange_base {
@@ -582,7 +582,7 @@ namespace ranges {
 
 _LIBCPP_END_NAMESPACE_STD
 
-#endif  // defined(_LIBCPP_HAS_NO_CONCEPTS) || _LIBCPP_STD_VER <= 17
+#endif  // !_STL_HAS_CONCEPTS || _LIBCPP_STD_VER <= 17
 
 _LIBCPP_POP_MACROS
 

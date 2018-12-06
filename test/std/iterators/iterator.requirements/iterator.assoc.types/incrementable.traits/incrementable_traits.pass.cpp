@@ -14,7 +14,7 @@
 #include <iterator>
 
 template <class T>
-_LIBCPP_CONCEPT_DECL has_member_difference_type =
+_STL_CONCEPT_DECL has_member_difference_type =
     requires { typename T::difference_type; };
 
 static_assert(std::Same<std::ptrdiff_t, std::iter_difference_t<int*>>);

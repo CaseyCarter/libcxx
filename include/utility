@@ -206,7 +206,7 @@ template <size_t I>
 #include <version>
 #include <__debug>
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 #include <concepts>
 #endif
 

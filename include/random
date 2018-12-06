@@ -1645,9 +1645,9 @@ class piecewise_linear_distribution
 #include <string>
 #include <istream>
 #include <ostream>
-#if !defined(_LIBCPP_HAS_NO_CONCEPTS) && _LIBCPP_STD_VER > 17
+#if _STL_HAS_CONCEPTS && _LIBCPP_STD_VER > 17
 #include <concepts>
-#endif // !defined(_LIBCPP_HAS_NO_CONCEPTS) && _LIBCPP_STD_VER > 17
+#endif
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #pragma GCC system_header
@@ -6740,11 +6740,11 @@ operator>>(basic_istream<_CharT, _Traits>& __is,
     return __is;
 }
 
-#if !defined(_LIBCPP_HAS_NO_CONCEPTS) && _LIBCPP_STD_VER > 17
+#if _STL_HAS_CONCEPTS && _LIBCPP_STD_VER > 17
 template <auto> struct __require_constant;
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL UniformRandomBitGenerator =
+_STL_CONCEPT_DECL UniformRandomBitGenerator =
     Invocable<_Tp&> && UnsignedIntegral<invoke_result_t<_Tp&>> &&
     requires {
         _Tp::min(); requires Same<decltype(_Tp::min()), invoke_result_t<_Tp&>>;
@@ -6755,7 +6755,7 @@ _LIBCPP_CONCEPT_DECL UniformRandomBitGenerator =
         requires _Tp::min() < _Tp::max();
 #endif
     };
-#endif // !defined(_LIBCPP_HAS_NO_CONCEPTS) && _LIBCPP_STD_VER > 17
+#endif // _STL_HAS_CONCEPTS && _LIBCPP_STD_VER > 17
 
 _LIBCPP_END_NAMESPACE_STD
 

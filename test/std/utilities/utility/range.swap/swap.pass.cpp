@@ -89,7 +89,7 @@ namespace constrained_swappable_ {
         ConstrainedSwappable(ConstrainedSwappable&&) = default;
     };
     template <class T>
-    _LIBCPP_CONCEPT_DECL C =
+    _STL_CONCEPT_DECL C =
         std::Same<T, ConstrainedSwappable>;
     template <C T, C U>
     void swap(T&, U&) {}

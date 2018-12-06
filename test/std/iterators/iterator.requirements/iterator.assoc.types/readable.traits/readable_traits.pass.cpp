@@ -13,7 +13,7 @@
 #include <iterator>
 
 template <class T>
-_LIBCPP_CONCEPT_DECL has_member_value_type =
+_STL_CONCEPT_DECL has_member_value_type =
     requires { typename T::value_type; };
 
 struct A { using value_type = int; int& operator*() const; };

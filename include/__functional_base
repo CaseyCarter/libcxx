@@ -18,7 +18,7 @@
 #include <new>
 #include <utility>
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 #include <concepts>
 #endif
 
@@ -664,42 +664,42 @@ struct identity
     using is_transparent = void;
 };
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 #ifdef _LIBCPP_HAS_NO_SPACESHIP_OPERATOR
 template <class, class>
-_LIBCPP_CONCEPT_DECL __has_member_spaceship = false;
+_STL_CONCEPT_DECL __has_member_spaceship = false;
 template <class, class>
-_LIBCPP_CONCEPT_DECL __has_nonmember_spaceship = false;
+_STL_CONCEPT_DECL __has_nonmember_spaceship = false;
 #else // _LIBCPP_HAS_NO_SPACESHIP_OPERATOR
 template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL __has_member_spaceship = requires(_Tp&& __t, _Up&& __u) {
+_STL_CONCEPT_DECL __has_member_spaceship = requires(_Tp&& __t, _Up&& __u) {
     static_cast<_Tp&&>(__t).operator<=>(static_cast<_Up&&>(__u));
 };
 template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL __has_nonmember_spaceship = requires(_Tp&& __t, _Up&& __u) {
+_STL_CONCEPT_DECL __has_nonmember_spaceship = requires(_Tp&& __t, _Up&& __u) {
     operator<=>(static_cast<_Tp&&>(__t), static_cast<_Up&&>(__u));
 };
 #endif // _LIBCPP_HAS_NO_SPACESHIP_OPERATOR
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __pointer_ish =
+_STL_CONCEPT_DECL __pointer_ish =
     is_pointer_v<_Tp> || is_convertible_v<_Tp, const volatile void*>;
 
 template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL __has_equal = requires(_Tp&& __t, _Up&& __u) {
+_STL_CONCEPT_DECL __has_equal = requires(_Tp&& __t, _Up&& __u) {
     static_cast<_Tp&&>(__t) == static_cast<_Up&&>(__u);
 };
 template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL __has_member_equal = requires(_Tp&& __t, _Up&& __u) {
+_STL_CONCEPT_DECL __has_member_equal = requires(_Tp&& __t, _Up&& __u) {
     static_cast<_Tp&&>(__t).operator==(static_cast<_Up&&>(__u));
 };
 template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL __has_nonmember_equal = requires(_Tp&& __t, _Up&& __u) {
+_STL_CONCEPT_DECL __has_nonmember_equal = requires(_Tp&& __t, _Up&& __u) {
     operator==(static_cast<_Tp&&>(__t), static_cast<_Up&&>(__u));
 };
 
 template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL __uses_ptr_equal = __has_equal<_Tp, _Up> &&
+_STL_CONCEPT_DECL __uses_ptr_equal = __has_equal<_Tp, _Up> &&
     !(__has_member_equal<_Tp, _Up> ||
       __has_nonmember_equal<_Tp, _Up> ||
       __has_member_spaceship<_Tp, _Up> ||
@@ -707,20 +707,20 @@ _LIBCPP_CONCEPT_DECL __uses_ptr_equal = __has_equal<_Tp, _Up> &&
     __pointer_ish<_Tp> && __pointer_ish<_Up>; // FIXME: types convertible to function pointers??!?
 
 template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL __has_less = requires(_Tp&& __t, _Up&& __u) {
+_STL_CONCEPT_DECL __has_less = requires(_Tp&& __t, _Up&& __u) {
     static_cast<_Tp&&>(__t) < static_cast<_Up&&>(__u);
 };
 template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL __has_member_less = requires(_Tp&& __t, _Up&& __u) {
+_STL_CONCEPT_DECL __has_member_less = requires(_Tp&& __t, _Up&& __u) {
     static_cast<_Tp&&>(__t).operator<(static_cast<_Up&&>(__u));
 };
 template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL __has_nonmember_less = requires(_Tp&& __t, _Up&& __u) {
+_STL_CONCEPT_DECL __has_nonmember_less = requires(_Tp&& __t, _Up&& __u) {
     operator<(static_cast<_Tp&&>(__t), static_cast<_Up&&>(__u));
 };
 
 template <class _Tp, class _Up>
-_LIBCPP_CONCEPT_DECL __uses_ptr_less = __has_less<_Tp, _Up> &&
+_STL_CONCEPT_DECL __uses_ptr_less = __has_less<_Tp, _Up> &&
     !(__has_member_less<_Tp, _Up> ||
       __has_nonmember_less<_Tp, _Up> ||
       __has_member_spaceship<_Tp, _Up> ||
@@ -773,7 +773,7 @@ namespace ranges
         using is_transparent = void;
     };
 } // namespace ranges
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 #endif // _LIBCPP_STD_VER > 17
 
 _LIBCPP_END_NAMESPACE_STD

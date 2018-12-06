@@ -30,7 +30,7 @@ int main()
         assert(v[v.size()-1] == 10);
         assert(static_cast<std::size_t>(end(v) - begin(v)) == v.size());
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
         static_assert(std::ContiguousIterator<decltype(std::end(v))>);
 #endif
     }

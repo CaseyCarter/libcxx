@@ -2527,7 +2527,7 @@ private:
 
 #endif // _LIBCPP_STD_VER > 14
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 namespace ranges {
     template <class _Tp = void>
         requires EqualityComparable<_Tp> || Same<_Tp, void> || __uses_ptr_equal<const _Tp&, const _Tp&>
@@ -2617,7 +2617,7 @@ namespace ranges {
         using is_transparent = void;
     };
 } // namespace ranges
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 
 _LIBCPP_END_NAMESPACE_STD
 

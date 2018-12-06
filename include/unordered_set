@@ -1527,7 +1527,7 @@ operator!=(const unordered_multiset<_Value, _Hash, _Pred, _Alloc>& __x,
     return !(__x == __y);
 }
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 namespace ranges {
 template <class> struct enable_view;
 template <class _Value, class _Hash, class _Pred, class _Alloc>
@@ -1539,7 +1539,7 @@ struct enable_view<unordered_multiset<_Value, _Hash, _Pred, _Alloc>>
     : false_type
 {};
 }
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 
 _LIBCPP_END_NAMESPACE_STD
 

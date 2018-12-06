@@ -28,7 +28,7 @@ int main()
         *begin(v) = 10;
         assert(v[0] == 10);
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
         static_assert(std::ContiguousIterator<decltype(std::begin(v))>);
 #endif
     }

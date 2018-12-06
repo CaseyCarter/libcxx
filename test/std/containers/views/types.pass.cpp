@@ -36,7 +36,7 @@
 
 #include "test_macros.h"
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 template<class>
 constexpr bool is_reverse_iterator = false;
 template<class I>
@@ -54,7 +54,7 @@ void testIterator()
     ASSERT_SAME_TYPE(typename ItT::pointer,           typename S::pointer);
     ASSERT_SAME_TYPE(typename ItT::difference_type,   typename S::difference_type);
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     if constexpr (!(std::is_volatile_v<typename S::element_type> || is_reverse_iterator<Iter>))
         static_assert(std::ContiguousIterator<Iter>);
 #endif
@@ -73,7 +73,7 @@ void testConstIterator()
     ASSERT_SAME_TYPE(typename ItT::pointer,           typename S::element_type const *);
     ASSERT_SAME_TYPE(typename ItT::difference_type,   typename S::difference_type);
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     if constexpr (!(std::is_volatile_v<typename S::element_type> || is_reverse_iterator<Iter>))
         static_assert(std::ContiguousIterator<Iter>);
 #endif

@@ -423,7 +423,7 @@ template <class E> constexpr const E* data(initializer_list<E> il) noexcept;    
 #include <Availability.h>
 #endif
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 #include <concepts>
 #endif
 
@@ -464,7 +464,7 @@ struct _LIBCPP_TEMPLATE_VIS forward_iterator_tag       : public input_iterator_t
 struct _LIBCPP_TEMPLATE_VIS bidirectional_iterator_tag : public forward_iterator_tag {};
 struct _LIBCPP_TEMPLATE_VIS random_access_iterator_tag : public bidirectional_iterator_tag {};
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 struct _LIBCPP_TEMPLATE_VIS contiguous_iterator_tag    : public random_access_iterator_tag {};
 
 template <class _Fn, class... _Args>
@@ -488,11 +488,11 @@ using __select = __apply<__select_<_Cond>, _Tp, _Fp>;
 template <class _Tp> using __reference_to = _Tp&;
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __can_reference =
+_STL_CONCEPT_DECL __can_reference =
     requires { typename __reference_to<_Tp>; };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __dereferenceable =
+_STL_CONCEPT_DECL __dereferenceable =
     requires(_Tp& __t) { { *__t } -> __can_reference&&; };
 
 template <class _Tp> struct _LIBCPP_TEMPLATE_VIS iterator_traits {
@@ -508,7 +508,7 @@ struct _LIBCPP_TEMPLATE_VIS incrementable_traits<_Tp*> {
 };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __has_member_difference_type =
+_STL_CONCEPT_DECL __has_member_difference_type =
     requires { typename _Tp::difference_type; };
 
 template <class _Tp>
@@ -523,7 +523,7 @@ struct _LIBCPP_TEMPLATE_VIS incrementable_traits<_Tp>
 };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __can_difference =
+_STL_CONCEPT_DECL __can_difference =
     requires(const _Tp& __x, const _Tp& __y) {
         { __x - __y } -> Integral;
     };
@@ -542,7 +542,7 @@ struct _LIBCPP_TEMPLATE_VIS incrementable_traits<_Tp>
 };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __is_not_specialized = requires {
+_STL_CONCEPT_DECL __is_not_specialized = requires {
     typename _Tp::__is_not_specialized;
     requires Same<_Tp, typename _Tp::__is_not_specialized>;
 };
@@ -578,7 +578,7 @@ struct _LIBCPP_TEMPLATE_VIS readable_traits<const _Tp>
 {};
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __has_member_value_type =
+_STL_CONCEPT_DECL __has_member_value_type =
     requires { typename _Tp::value_type; };
 
 template <__has_member_value_type _Tp>
@@ -593,7 +593,7 @@ struct _LIBCPP_TEMPLATE_VIS readable_traits<_Tp>
 };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __has_member_element_type =
+_STL_CONCEPT_DECL __has_member_element_type =
     requires { typename _Tp::element_type; };
 
 template <__has_member_element_type _Tp>
@@ -623,7 +623,7 @@ namespace ranges
         void iter_move() = delete; // Block unqualified lookup
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_adl = requires(_Tp&& __t) {
+        _STL_CONCEPT_DECL __has_adl = requires(_Tp&& __t) {
             iter_move(static_cast<_Tp&&>(__t));
         };
 
@@ -666,7 +666,7 @@ using iter_rvalue_reference_t =
     decltype(_VSTD::ranges::iter_move(_VSTD::declval<_Tp&>()));
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL Readable =
+_STL_CONCEPT_DECL Readable =
     requires {
         typename iter_value_t<_Iter>;
         typename iter_reference_t<_Iter>;
@@ -681,7 +681,7 @@ using iter_common_reference_t =
     common_reference_t<iter_reference_t<_Tp>, iter_value_t<_Tp>&>;
 
 template <class _Iter, class _Tp>
-_LIBCPP_CONCEPT_DECL Writable =
+_STL_CONCEPT_DECL Writable =
     requires(_Iter&& __i, _Tp&& __t) {
         *__i = static_cast<_Tp&&>(__t);
         *static_cast<_Iter&&>(__i) = static_cast<_Tp&&>(__t);
@@ -692,7 +692,7 @@ _LIBCPP_CONCEPT_DECL Writable =
     };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL WeaklyIncrementable =
+_STL_CONCEPT_DECL WeaklyIncrementable =
     Semiregular<_Tp> && requires(_Tp __i) {
         typename iter_difference_t<_Tp>;
         requires SignedIntegral<iter_difference_t<_Tp>>;
@@ -701,20 +701,20 @@ _LIBCPP_CONCEPT_DECL WeaklyIncrementable =
     };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL Incrementable =
+_STL_CONCEPT_DECL Incrementable =
     Regular<_Tp> && WeaklyIncrementable<_Tp> && requires(_Tp __t) {
         __t++; requires Same<decltype(__t++), _Tp>;
     };
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL Iterator =
+_STL_CONCEPT_DECL Iterator =
     requires(_Iter __i) {
         { *__i } -> __can_reference&&;
         requires WeaklyIncrementable<_Iter>;
     };
 
 template <class _Sent, class _Iter>
-_LIBCPP_CONCEPT_DECL Sentinel =
+_STL_CONCEPT_DECL Sentinel =
     Semiregular<_Sent> && Iterator<_Iter> &&
     __weakly_equality_comparable<_Sent, _Iter>;
 
@@ -722,7 +722,7 @@ template <class _Sent, class _Iter>
 inline constexpr bool disable_sized_sentinel = false;
 
 template <class _Sent, class _Iter>
-_LIBCPP_CONCEPT_DECL SizedSentinel =
+_STL_CONCEPT_DECL SizedSentinel =
     Sentinel<_Sent, _Iter> &&
     !disable_sized_sentinel<remove_cv_t<_Sent>, remove_cv_t<_Iter>> &&
     requires(const _Iter& __i, const _Sent& __s) {
@@ -731,19 +731,19 @@ _LIBCPP_CONCEPT_DECL SizedSentinel =
     };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __has_member_pointer =
+_STL_CONCEPT_DECL __has_member_pointer =
     requires { typename _Tp::pointer; };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __has_member_reference =
+_STL_CONCEPT_DECL __has_member_reference =
     requires { typename _Tp::reference; };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __has_member_category =
+_STL_CONCEPT_DECL __has_member_category =
     requires { typename _Tp::iterator_category; };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __has_member_iter_concept =
+_STL_CONCEPT_DECL __has_member_iter_concept =
     requires { typename _Tp::iterator_concept; };
 
 template <class _Iter, bool _NotSpec = __is_not_specialized<iterator_traits<_Iter>>>
@@ -788,26 +788,26 @@ template <class _Iter>
 using __iter_concept = typename __iter_concept_<_Iter>::type;
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL InputIterator =
+_STL_CONCEPT_DECL InputIterator =
     Iterator<_Iter> && Readable<_Iter> &&
     requires { typename __iter_concept<_Iter>; } &&
     DerivedFrom<__iter_concept<_Iter>, input_iterator_tag>;
 
 template <class _Iter, class _Tp>
-_LIBCPP_CONCEPT_DECL OutputIterator =
+_STL_CONCEPT_DECL OutputIterator =
     Iterator<_Iter> && Writable<_Iter, _Tp> && requires(_Iter __i, _Tp&& __t) {
         *__i++ = static_cast<_Tp&&>(__t);
     };
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL ForwardIterator =
+_STL_CONCEPT_DECL ForwardIterator =
     InputIterator<_Iter> &&
     DerivedFrom<__iter_concept<_Iter>, forward_iterator_tag> &&
     Incrementable<_Iter> &&
     Sentinel<_Iter, _Iter>;
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL BidirectionalIterator =
+_STL_CONCEPT_DECL BidirectionalIterator =
     ForwardIterator<_Iter> &&
     DerivedFrom<__iter_concept<_Iter>, bidirectional_iterator_tag> &&
     requires(_Iter __i) {
@@ -816,7 +816,7 @@ _LIBCPP_CONCEPT_DECL BidirectionalIterator =
     };
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL RandomAccessIterator =
+_STL_CONCEPT_DECL RandomAccessIterator =
     BidirectionalIterator<_Iter> &&
     DerivedFrom<__iter_concept<_Iter>, random_access_iterator_tag> &&
     StrictTotallyOrdered<_Iter> &&
@@ -831,14 +831,14 @@ _LIBCPP_CONCEPT_DECL RandomAccessIterator =
     };
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL ContiguousIterator =
+_STL_CONCEPT_DECL ContiguousIterator =
     RandomAccessIterator<_Iter> &&
     DerivedFrom<__iter_concept<_Iter>, contiguous_iterator_tag> &&
     is_lvalue_reference_v<iter_reference_t<_Iter>> &&
     Same<iter_value_t<_Iter>, remove_cvref_t<iter_reference_t<_Iter>>>;
 
 template <class _Fn, class _Iter>
-_LIBCPP_CONCEPT_DECL IndirectUnaryInvocable =
+_STL_CONCEPT_DECL IndirectUnaryInvocable =
     Readable<_Iter> && CopyConstructible<_Fn> &&
     Invocable<_Fn&, iter_value_t<_Iter>&> &&
     Invocable<_Fn&, iter_reference_t<_Iter>> &&
@@ -848,7 +848,7 @@ _LIBCPP_CONCEPT_DECL IndirectUnaryInvocable =
         invoke_result_t<_Fn&, iter_reference_t<_Iter>>>;
 
 template <class _Fn, class _Iter>
-_LIBCPP_CONCEPT_DECL IndirectRegularUnaryInvocable =
+_STL_CONCEPT_DECL IndirectRegularUnaryInvocable =
     Readable<_Iter> && CopyConstructible<_Fn> &&
     RegularInvocable<_Fn&, iter_value_t<_Iter>&> &&
     RegularInvocable<_Fn&, iter_reference_t<_Iter>> &&
@@ -858,14 +858,14 @@ _LIBCPP_CONCEPT_DECL IndirectRegularUnaryInvocable =
         invoke_result_t<_Fn&, iter_reference_t<_Iter>>>;
 
 template <class _Fn, class _Iter>
-_LIBCPP_CONCEPT_DECL IndirectUnaryPredicate =
+_STL_CONCEPT_DECL IndirectUnaryPredicate =
     Readable<_Iter> && CopyConstructible<_Fn> &&
     Predicate<_Fn&, iter_value_t<_Iter>&> &&
     Predicate<_Fn&, iter_reference_t<_Iter>> &&
     Predicate<_Fn&, iter_common_reference_t<_Iter>>;
 
 template <class _Fn, class _Iter1, class _Iter2 = _Iter1>
-_LIBCPP_CONCEPT_DECL IndirectRelation =
+_STL_CONCEPT_DECL IndirectRelation =
     Readable<_Iter1> && Readable<_Iter2> && CopyConstructible<_Fn> &&
     Relation<_Fn&, iter_value_t<_Iter1>&, iter_value_t<_Iter2>&> &&
     Relation<_Fn&, iter_value_t<_Iter1>&, iter_reference_t<_Iter2>> &&
@@ -874,7 +874,7 @@ _LIBCPP_CONCEPT_DECL IndirectRelation =
     Relation<_Fn&, iter_common_reference_t<_Iter1>, iter_common_reference_t<_Iter2>>;
 
 template <class _Fn, class _Iter1, class _Iter2 = _Iter1>
-_LIBCPP_CONCEPT_DECL IndirectStrictWeakOrder =
+_STL_CONCEPT_DECL IndirectStrictWeakOrder =
     Readable<_Iter1> && Readable<_Iter2> && CopyConstructible<_Fn> &&
     StrictWeakOrder<_Fn&, iter_value_t<_Iter1>&, iter_value_t<_Iter2>&> &&
     StrictWeakOrder<_Fn&, iter_value_t<_Iter1>&, iter_reference_t<_Iter2>> &&
@@ -900,11 +900,11 @@ struct incrementable_traits<projected<_Iter, _Proj>>
 };
 
 template <class _In, class _Out>
-_LIBCPP_CONCEPT_DECL IndirectlyMovable =
+_STL_CONCEPT_DECL IndirectlyMovable =
     Readable<_In> && Writable<_Out, iter_rvalue_reference_t<_In>>;
 
 template <class _In, class _Out>
-_LIBCPP_CONCEPT_DECL IndirectlyMovableStorable =
+_STL_CONCEPT_DECL IndirectlyMovableStorable =
     IndirectlyMovable<_In, _Out> &&
     Writable<_Out, iter_value_t<_In>> &&
     Movable<iter_value_t<_In>> &&
@@ -912,11 +912,11 @@ _LIBCPP_CONCEPT_DECL IndirectlyMovableStorable =
     Assignable<iter_value_t<_In>&, iter_rvalue_reference_t<_In>>;
 
 template <class _In, class _Out>
-_LIBCPP_CONCEPT_DECL IndirectlyCopyable =
+_STL_CONCEPT_DECL IndirectlyCopyable =
     Readable<_In> && Writable<_Out, iter_reference_t<_In>>;
 
 template <class _In, class _Out>
-_LIBCPP_CONCEPT_DECL IndirectlyCopyableStorable =
+_STL_CONCEPT_DECL IndirectlyCopyableStorable =
     IndirectlyCopyable<_In, _Out> &&
     Writable<_Out, const iter_value_t<_In>&> &&
     Copyable<iter_value_t<_In>> &&
@@ -931,12 +931,12 @@ namespace ranges
         void iter_swap(_Tp, _Up) = delete;
 
         template <class _Tp, class _Up>
-        _LIBCPP_CONCEPT_DECL __has_adl = requires(_Tp&& __t, _Up&& __u) {
+        _STL_CONCEPT_DECL __has_adl = requires(_Tp&& __t, _Up&& __u) {
             iter_swap(static_cast<_Tp&&>(__t), static_cast<_Up&&>(__u));
         };
 
         template <class _Tp, class _Up>
-        _LIBCPP_CONCEPT_DECL __can_swap_references =
+        _STL_CONCEPT_DECL __can_swap_references =
             Readable<remove_reference_t<_Tp>> &&
             Readable<remove_reference_t<_Up>> &&
             SwappableWith<iter_reference_t<_Tp>, iter_reference_t<_Up>>;
@@ -1000,7 +1000,7 @@ namespace ranges
 } // namespace ranges
 
 template <class _Iter1, class _Iter2 = _Iter1>
-_LIBCPP_CONCEPT_DECL IndirectlySwappable =
+_STL_CONCEPT_DECL IndirectlySwappable =
     Readable<_Iter1> && Readable<_Iter2> &&
     requires(_Iter1& __i1, _Iter2& __i2) {
         _VSTD::ranges::iter_swap(__i1, __i1);
@@ -1011,18 +1011,18 @@ _LIBCPP_CONCEPT_DECL IndirectlySwappable =
 
 template <class _Iter1, class _Iter2, class _Rel,
     class _Proj1 = identity, class _Proj2 = identity>
-_LIBCPP_CONCEPT_DECL IndirectlyComparable =
+_STL_CONCEPT_DECL IndirectlyComparable =
     IndirectRelation<_Rel, projected<_Iter1, _Proj1>, projected<_Iter2, _Proj2>>;
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL Permutable =
+_STL_CONCEPT_DECL Permutable =
     ForwardIterator<_Iter> &&
     IndirectlyMovableStorable<_Iter, _Iter> &&
     IndirectlySwappable<_Iter, _Iter>;
 
 template <class _Iter1, class _Iter2, class _Out, class _Rel = ranges::less<>,
     class _Proj1 = identity, class _Proj2 = identity>
-_LIBCPP_CONCEPT_DECL Mergeable =
+_STL_CONCEPT_DECL Mergeable =
     InputIterator<_Iter1> &&
     InputIterator<_Iter2> &&
     WeaklyIncrementable<_Out> &&
@@ -1031,7 +1031,7 @@ _LIBCPP_CONCEPT_DECL Mergeable =
     IndirectStrictWeakOrder<_Rel, projected<_Iter1, _Proj1>, projected<_Iter2, _Proj2>>;
 
 template <class _Iter, class _Rel = ranges::less<>, class _Proj = identity>
-_LIBCPP_CONCEPT_DECL Sortable =
+_STL_CONCEPT_DECL Sortable =
     Permutable<_Iter> && IndirectStrictWeakOrder<_Rel, projected<_Iter, _Proj>>;
 
 template <class _Tp>
@@ -1047,14 +1047,14 @@ struct _LIBCPP_TEMPLATE_VIS iterator_traits<_Tp*>
 };
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL _Cpp17Iterator = Copyable<_Iter> && requires(_Iter __i) {
+_STL_CONCEPT_DECL _Cpp17Iterator = Copyable<_Iter> && requires(_Iter __i) {
     { *__i } -> __can_reference&&;
     { ++__i } -> Same<_Iter>&;
     { *__i++ } -> __can_reference&&;
 };
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL _Cpp17InputIterator =
+_STL_CONCEPT_DECL _Cpp17InputIterator =
     _Cpp17Iterator<_Iter> && EqualityComparable<_Iter> &&
     __has_member_difference_type<incrementable_traits<_Iter>> &&
     __has_member_value_type<readable_traits<_Iter>> &&
@@ -1067,7 +1067,7 @@ _LIBCPP_CONCEPT_DECL _Cpp17InputIterator =
     };
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL _Cpp17ForwardIterator =
+_STL_CONCEPT_DECL _Cpp17ForwardIterator =
     _Cpp17InputIterator<_Iter> && Constructible<_Iter> &&
     is_lvalue_reference_v<iter_reference_t<_Iter>> &&
     Same<remove_cvref_t<iter_reference_t<_Iter>>,
@@ -1078,7 +1078,7 @@ _LIBCPP_CONCEPT_DECL _Cpp17ForwardIterator =
     };
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL _Cpp17BidirectionalIterator =
+_STL_CONCEPT_DECL _Cpp17BidirectionalIterator =
     _Cpp17ForwardIterator<_Iter> && requires(_Iter __i) {
         { --__i } -> Same<_Iter>&;
         { __i-- } -> const _Iter&;
@@ -1086,7 +1086,7 @@ _LIBCPP_CONCEPT_DECL _Cpp17BidirectionalIterator =
     };
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL _Cpp17RandomAccessIterator =
+_STL_CONCEPT_DECL _Cpp17RandomAccessIterator =
     _Cpp17BidirectionalIterator<_Iter> && StrictTotallyOrdered<_Iter> &&
     requires(_Iter __i, typename incrementable_traits<_Iter>::difference_type __n) {
         { __i += __n } -> Same<_Iter>&;
@@ -1099,7 +1099,7 @@ _LIBCPP_CONCEPT_DECL _Cpp17RandomAccessIterator =
     };
 
 template <class _Iter>
-_LIBCPP_CONCEPT_DECL __has_iter_types =
+_STL_CONCEPT_DECL __has_iter_types =
     __has_member_difference_type<_Iter> &&
     __has_member_value_type<_Iter> &&
     __has_member_reference<_Iter> &&
@@ -1148,7 +1148,7 @@ struct _LIBCPP_TEMPLATE_VIS __iter_traits_pointer<2>
 };
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL __has_op_arrow =
+_STL_CONCEPT_DECL __has_op_arrow =
     requires(_Tp&& __t) { static_cast<_Tp&&>(__t).operator->(); };
 
 template <bool>
@@ -1227,14 +1227,14 @@ namespace ranges
         void begin(initializer_list<_Tp>&&) = delete;
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_member =
+        _STL_CONCEPT_DECL __has_member =
             is_lvalue_reference_v<_Tp> && requires(_Tp& __t) {
                 __t.begin();
                 { _VSTD::__test_convert(__t.begin()) } -> Iterator;
             };
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_adl = requires(_Tp&& __t) {
+        _STL_CONCEPT_DECL __has_adl = requires(_Tp&& __t) {
             begin(static_cast<_Tp&&>(__t));
             { _VSTD::__test_convert(begin(static_cast<_Tp&&>(__t))) } -> Iterator;
         };
@@ -1277,7 +1277,7 @@ namespace ranges
         void end(initializer_list<_Tp>&&) = delete;
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_member =
+        _STL_CONCEPT_DECL __has_member =
             is_lvalue_reference_v<_Tp> && requires(_Tp& __t) {
                 __t.end();
                 begin(__t);
@@ -1285,7 +1285,7 @@ namespace ranges
             };
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_adl = requires(_Tp&& __t) {
+        _STL_CONCEPT_DECL __has_adl = requires(_Tp&& __t) {
             end(static_cast<_Tp&&>(__t));
             begin(static_cast<_Tp&&>(__t));
             { _VSTD::__test_convert(end(static_cast<_Tp&&>(__t))) } ->
@@ -1379,14 +1379,14 @@ namespace ranges
         template <class _Tp> void rbegin(_Tp&&) = delete;
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_member =
+        _STL_CONCEPT_DECL __has_member =
             is_lvalue_reference_v<_Tp> && requires(_Tp& __t) {
                 __t.rbegin();
                 { _VSTD::__test_convert(__t.rbegin()) } -> Iterator;
             };
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_adl = requires(_Tp&& __t) {
+        _STL_CONCEPT_DECL __has_adl = requires(_Tp&& __t) {
             rbegin(static_cast<_Tp&&>(__t));
             { _VSTD::__test_convert(rbegin(static_cast<_Tp&&>(__t))) } -> Iterator;
         };
@@ -1433,7 +1433,7 @@ namespace ranges
         template <class _Tp> void rend(_Tp&&) = delete;
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_member =
+        _STL_CONCEPT_DECL __has_member =
             is_lvalue_reference_v<_Tp> && requires(_Tp& __t) {
                 __t.rend();
                 rbegin(__t);
@@ -1442,7 +1442,7 @@ namespace ranges
             };
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_adl = requires(_Tp&& __t) {
+        _STL_CONCEPT_DECL __has_adl = requires(_Tp&& __t) {
             rend(static_cast<_Tp&&>(__t));
             rbegin(static_cast<_Tp&&>(__t));
             { _VSTD::__test_convert(rend(static_cast<_Tp&&>(__t))) } ->
@@ -1528,14 +1528,14 @@ namespace ranges
         template <class _Tp> void size(_Tp&&) = delete;
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_member = requires(_Tp&& __t) {
+        _STL_CONCEPT_DECL __has_member = requires(_Tp&& __t) {
             requires !disable_sized_range<remove_cvref_t<_Tp>>;
             static_cast<_Tp&&>(__t).size();
             { _VSTD::__test_convert(static_cast<_Tp&&>(__t).size()) } -> Integral;
         };
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_adl = requires(_Tp&& __t) {
+        _STL_CONCEPT_DECL __has_adl = requires(_Tp&& __t) {
             requires !disable_sized_range<remove_cvref_t<_Tp>>;
             size(static_cast<_Tp&&>(__t));
             { _VSTD::__test_convert(size(static_cast<_Tp&&>(__t))) } -> Integral;
@@ -1587,13 +1587,13 @@ namespace ranges
     namespace __empty
     {
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_member = requires(_Tp&& __t) {
+        _STL_CONCEPT_DECL __has_member = requires(_Tp&& __t) {
             static_cast<_Tp&&>(__t).empty();
             bool(static_cast<_Tp&&>(__t).empty());
         };
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_size = requires(_Tp&& __t) {
+        _STL_CONCEPT_DECL __has_size = requires(_Tp&& __t) {
             size(static_cast<_Tp&&>(__t));
         };
 
@@ -1636,18 +1636,18 @@ namespace ranges
     namespace __data
     {
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __is_object_pointer =
+        _STL_CONCEPT_DECL __is_object_pointer =
             is_pointer_v<_Tp> && is_object_v<remove_pointer_t<_Tp>>;
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_member =
+        _STL_CONCEPT_DECL __has_member =
             is_lvalue_reference_v<_Tp> && requires(_Tp& __t) {
                 __t.data();
                 _VSTD::__test_convert(__t.data()) -> __is_object_pointer;
             };
 
         template <class _Tp>
-        _LIBCPP_CONCEPT_DECL __has_pointer_begin = requires(_Tp&& __t) {
+        _STL_CONCEPT_DECL __has_pointer_begin = requires(_Tp&& __t) {
             { begin(static_cast<_Tp&&>(__t)) } -> __is_object_pointer;
         };
 
@@ -1764,16 +1764,16 @@ namespace ranges
     };
 
     template <class _Rng>
-    _LIBCPP_CONCEPT_DECL __range_impl = requires(_Rng&& __r) {
+    _STL_CONCEPT_DECL __range_impl = requires(_Rng&& __r) {
         begin(static_cast<_Rng&&>(__r));
         end(static_cast<_Rng&&>(__r));
     };
 
     template <class _Rng>
-    _LIBCPP_CONCEPT_DECL Range = __range_impl<_Rng&>;
+    _STL_CONCEPT_DECL Range = __range_impl<_Rng&>;
 
     template <class _Rng>
-    _LIBCPP_CONCEPT_DECL __forwarding_range = Range<_Rng> && __range_impl<_Rng>;
+    _STL_CONCEPT_DECL __forwarding_range = Range<_Rng> && __range_impl<_Rng>;
 
     template <class _Rng>
     using iterator_t = decltype(begin(_VSTD::declval<_Rng&>()));
@@ -1782,7 +1782,7 @@ namespace ranges
     using sentinel_t = decltype(end(_VSTD::declval<_Rng&>()));
 
     template <class _Rng>
-    _LIBCPP_CONCEPT_DECL SizedRange =
+    _STL_CONCEPT_DECL SizedRange =
         Range<_Rng> && !disable_sized_range<remove_cvref_t<_Rng>> &&
         requires(_Rng& __r) {
             { size(__r) } -> ConvertibleTo<iter_difference_t<iterator_t<_Rng>>>;
@@ -1935,7 +1935,7 @@ struct _LIBCPP_TEMPLATE_VIS iterator_traits<_Tp*>
     typedef _Tp& reference;
     typedef random_access_iterator_tag iterator_category;
 };
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 
 template <class _Tp>
 struct __has_iterator_category
@@ -2075,7 +2075,7 @@ template <class _Tp>
 struct __is_stashing_iterator<_Tp, typename __void_t<typename _Tp::__stashing_iterator_tag>::type>
   : true_type {};
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 template <class _Cat>
 using __not_contiguous_cat = __select<
     DerivedFrom<_Cat, random_access_iterator_tag>,
@@ -2096,7 +2096,7 @@ class _LIBCPP_TEMPLATE_VIS reverse_iterator
                       typename iterator_traits<_Iter>::difference_type,
                       typename iterator_traits<_Iter>::pointer,
                       typename iterator_traits<_Iter>::reference>
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 {
 private:
     /*mutable*/ _Iter __t;  // no longer used as of LWG #2360, not removed due to ABI break
@@ -2109,7 +2109,7 @@ protected:
     _Iter current;
 public:
     typedef _Iter                                            iterator_type;
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     using typename reverse_iterator::iterator::difference_type;
     using typename reverse_iterator::iterator::reference;
 #else
@@ -2152,7 +2152,7 @@ public:
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
     reference         operator[](difference_type __n) const {return *(*this + __n);}
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     using iterator_concept = __select<RandomAccessIterator<_Iter>,
         random_access_iterator_tag, bidirectional_iterator_tag>;
 
@@ -2183,10 +2183,10 @@ public:
 #else // ^^^ Ranges / !Ranges vvv
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
     pointer  operator->() const {return _VSTD::addressof(operator*());}
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 };
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 template <class _Iter1, class _Iter2>
 requires (!SizedSentinel<_Iter1, _Iter2>)
 inline constexpr bool disable_sized_sentinel<
@@ -2194,7 +2194,7 @@ inline constexpr bool disable_sized_sentinel<
 #endif
 
 template <class _Iter1, class _Iter2>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter1& __x, const _Iter2& __y) { { __x == __y } -> bool; }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2205,7 +2205,7 @@ operator==(const reverse_iterator<_Iter1>& __x, const reverse_iterator<_Iter2>& 
 }
 
 template <class _Iter1, class _Iter2>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter1& __x, const _Iter2& __y) { { __x > __y } -> bool; }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2216,7 +2216,7 @@ operator<(const reverse_iterator<_Iter1>& __x, const reverse_iterator<_Iter2>& _
 }
 
 template <class _Iter1, class _Iter2>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter1& __x, const _Iter2& __y) { { __x != __y } -> bool; }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2227,7 +2227,7 @@ operator!=(const reverse_iterator<_Iter1>& __x, const reverse_iterator<_Iter2>& 
 }
 
 template <class _Iter1, class _Iter2>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter1& __x, const _Iter2& __y) { { __x < __y } -> bool; }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2238,7 +2238,7 @@ operator>(const reverse_iterator<_Iter1>& __x, const reverse_iterator<_Iter2>& _
 }
 
 template <class _Iter1, class _Iter2>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter1& __x, const _Iter2& __y) { { __x <= __y } -> bool; }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2249,7 +2249,7 @@ operator>=(const reverse_iterator<_Iter1>& __x, const reverse_iterator<_Iter2>& 
 }
 
 template <class _Iter1, class _Iter2>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter1& __x, const _Iter2& __y) { { __x >= __y } -> bool; }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2290,11 +2290,11 @@ template <class _Container>
 class _LIBCPP_TEMPLATE_VIS back_insert_iterator
     : public iterator<output_iterator_tag,
                       void,
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
                       ptrdiff_t,
 #else
                       void,
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
                       void,
                       void>
 {
@@ -2303,9 +2303,9 @@ protected:
 public:
     typedef _Container container_type;
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR back_insert_iterator() = default;
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY explicit back_insert_iterator(_Container& __x) : container(_VSTD::addressof(__x)) {}
     _LIBCPP_INLINE_VISIBILITY back_insert_iterator& operator=(const typename _Container::value_type& __value_)
         {container->push_back(__value_); return *this;}
@@ -2330,7 +2330,7 @@ template <class _Container>
 class _LIBCPP_TEMPLATE_VIS front_insert_iterator
     : public iterator<output_iterator_tag,
                       void,
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
                       ptrdiff_t,
 #else
                       void,
@@ -2343,9 +2343,9 @@ protected:
 public:
     typedef _Container container_type;
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR front_insert_iterator() = default;
-#endif //_LIBCPP_HAS_RANGES
+#endif //_STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY explicit front_insert_iterator(_Container& __x) : container(_VSTD::addressof(__x)) {}
     _LIBCPP_INLINE_VISIBILITY front_insert_iterator& operator=(const typename _Container::value_type& __value_)
         {container->push_front(__value_); return *this;}
@@ -2370,32 +2370,32 @@ template <class _Container>
 class _LIBCPP_TEMPLATE_VIS insert_iterator
     : public iterator<output_iterator_tag,
                       void,
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
                       ptrdiff_t,
-#else // _LIBCPP_HAS_RANGES
+#else // _STL_HAS_RANGES
                       void,
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
                       void,
                       void>
 {
 private:
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     using _Iter = ranges::iterator_t<_Container>;
 protected:
     _Container* container = nullptr;
     _Iter iter{};
-#else // _LIBCPP_HAS_RANGES
+#else // _STL_HAS_RANGES
     typedef typename _Container::iterator _Iter;
 protected:
     _Container* container;
     _Iter iter;
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 public:
     typedef _Container container_type;
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR insert_iterator() = default;
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY insert_iterator(_Container& __x, _Iter __i)
         : container(_VSTD::addressof(__x)), iter(__i) {}
     _LIBCPP_INLINE_VISIBILITY insert_iterator& operator=(const typename _Container::value_type& __value_)
@@ -2412,18 +2412,18 @@ public:
 template <class _Container>
 inline _LIBCPP_INLINE_VISIBILITY
 insert_iterator<_Container>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 inserter(_Container& __x, ranges::iterator_t<_Container> __i)
-#else // _LIBCPP_HAS_RANGES
+#else // _STL_HAS_RANGES
 inserter(_Container& __x, typename _Container::iterator __i)
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 {
     return insert_iterator<_Container>(__x, __i);
 }
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 class default_sentinel {};
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 
 template <class _Tp, class _CharT = char,
           class _Traits = char_traits<_CharT>, class _Distance = ptrdiff_t>
@@ -2468,7 +2468,7 @@ public:
     operator==(const istream_iterator<_Up, _CharU, _TraitsU, _DistanceU>& __x,
                const istream_iterator<_Up, _CharU, _TraitsU, _DistanceU>& __y);
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR istream_iterator(default_sentinel)
         : istream_iterator() {}
 
@@ -2480,7 +2480,7 @@ public:
     { return !(__x == __y); }
     friend bool operator!=(default_sentinel __y, const istream_iterator& __x)
     { return !(__x == __y); }
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 };
 
 template <class _Tp, class _CharT, class _Traits, class _Distance>
@@ -2504,11 +2504,11 @@ operator!=(const istream_iterator<_Tp, _CharT, _Traits, _Distance>& __x,
 template <class _Tp, class _CharT = char, class _Traits = char_traits<_CharT> >
 class _LIBCPP_TEMPLATE_VIS ostream_iterator
     : public iterator<output_iterator_tag, void,
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     ptrdiff_t,
-#else // _LIBCPP_HAS_RANGES
+#else // _STL_HAS_RANGES
     void,
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
     void, void>
 {
 public:
@@ -2519,10 +2519,10 @@ private:
     ostream_type* __out_stream_;
     const char_type* __delim_;
 public:
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR ostream_iterator() _NOEXCEPT
         : __out_stream_(nullptr), __delim_(nullptr) {}
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY ostream_iterator(ostream_type& __s) _NOEXCEPT
         : __out_stream_(_VSTD::addressof(__s)), __delim_(0) {}
     _LIBCPP_INLINE_VISIBILITY ostream_iterator(ostream_type& __s, const _CharT* __delimiter) _NOEXCEPT
@@ -2597,7 +2597,7 @@ public:
     _LIBCPP_INLINE_VISIBILITY bool equal(const istreambuf_iterator& __b) const
         {return __test_for_eof() == __b.__test_for_eof();}
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR istreambuf_iterator(default_sentinel) _NOEXCEPT
         : istreambuf_iterator() {}
 
@@ -2609,7 +2609,7 @@ public:
     { return !(__x == __y); }
     friend bool operator!=(default_sentinel __y, const istreambuf_iterator& __x)
     { return !(__x == __y); }
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 };
 
 template <class _CharT, class _Traits>
@@ -2627,11 +2627,11 @@ bool operator!=(const istreambuf_iterator<_CharT,_Traits>& __a,
 template <class _CharT, class _Traits>
 class _LIBCPP_TEMPLATE_VIS ostreambuf_iterator
     : public iterator<output_iterator_tag, void,
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     ptrdiff_t,
-#else // _LIBCPP_HAS_RANGES
+#else // _STL_HAS_RANGES
     void,
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
     void, void>
 {
 public:
@@ -2642,10 +2642,10 @@ public:
 private:
     streambuf_type* __sbuf_;
 public:
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR ostreambuf_iterator() _NOEXCEPT
         : __sbuf_(nullptr) {}
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY ostreambuf_iterator(ostream_type& __s) _NOEXCEPT
         : __sbuf_(__s.rdbuf()) {}
     _LIBCPP_INLINE_VISIBILITY ostreambuf_iterator(streambuf_type* __s) _NOEXCEPT
@@ -2675,7 +2675,7 @@ public:
 #endif
 };
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 template <Semiregular> class move_sentinel;
 #endif
 
@@ -2686,7 +2686,7 @@ private:
     _Iter __i;
 public:
     typedef _Iter                                            iterator_type;
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     using iterator_category =
         __not_contiguous_cat<typename iterator_traits<_Iter>::iterator_category>;
     using value_type = iter_value_t<iterator_type>;
@@ -2707,7 +2707,7 @@ public:
 #else
     typedef typename iterator_traits<iterator_type>::reference reference;
 #endif
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
     typedef iterator_type pointer;
 
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2735,7 +2735,7 @@ public:
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
     move_iterator& operator-=(difference_type __n) {__i -= __n; return *this;}
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
     reference operator*() const { return _VSTD::ranges::iter_move(__i); }
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2795,11 +2795,11 @@ public:
     move_iterator  operator++(int) { move_iterator __tmp(*this); ++__i; return __tmp; }
     _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
     reference operator[](difference_type __n) const { return static_cast<reference>(__i[__n]); }
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 };
 
 template <class _Iter1, class _Iter2>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter1& __x, const _Iter2& __y) { { __x == __y } -> bool; }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2810,7 +2810,7 @@ operator==(const move_iterator<_Iter1>& __x, const move_iterator<_Iter2>& __y)
 }
 
 template <class _Iter1, class _Iter2>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter1& __x, const _Iter2& __y) { { __x != __y } -> bool; }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2821,7 +2821,7 @@ operator!=(const move_iterator<_Iter1>& __x, const move_iterator<_Iter2>& __y)
 }
 
 template <class _Iter1, class _Iter2>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter1& __x, const _Iter2& __y) { { __x < __y } -> bool; }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2832,7 +2832,7 @@ operator<(const move_iterator<_Iter1>& __x, const move_iterator<_Iter2>& __y)
 }
 
 template <class _Iter1, class _Iter2>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter1& __x, const _Iter2& __y) { { __x > __y } -> bool; }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2843,7 +2843,7 @@ operator>(const move_iterator<_Iter1>& __x, const move_iterator<_Iter2>& __y)
 }
 
 template <class _Iter1, class _Iter2>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter1& __x, const _Iter2& __y) { { __x <= __y } -> bool; }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2854,7 +2854,7 @@ operator<=(const move_iterator<_Iter1>& __x, const move_iterator<_Iter2>& __y)
 }
 
 template <class _Iter1, class _Iter2>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter1& __x, const _Iter2& __y) { { __x >= __y } -> bool; }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2884,7 +2884,7 @@ operator-(const move_iterator<_Iter1>& __x, const move_iterator<_Iter2>& __y)
 #endif
 
 template <class _Iter>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(const _Iter& __x, iter_difference_t<_Iter> __n) { { __x + __n } -> _Iter; } // FIXME: specify conversion?
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2895,7 +2895,7 @@ operator+(typename move_iterator<_Iter>::difference_type __n, const move_iterato
 }
 
 template <class _Iter>
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 requires requires(_Iter __x) { move_iterator<_Iter>(__x); }
 #endif
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
@@ -2905,7 +2905,7 @@ make_move_iterator(_Iter __i)
     return move_iterator<_Iter>(__i);
 }
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 template <Semiregular _Sent>
 class move_sentinel
 {
@@ -2931,7 +2931,7 @@ public:
 namespace __common_iterator_detail
 {
     template <class T, class U>
-    _LIBCPP_CONCEPT_DECL __different = !Same<T, U>;
+    _STL_CONCEPT_DECL __different = !Same<T, U>;
 
     template <Iterator _Iter, Sentinel<_Iter> _Sent>
     requires __different<_Iter, _Sent>
@@ -3463,7 +3463,7 @@ struct unreachable {
     friend constexpr bool operator!=(const _Iter&, unreachable) _NOEXCEPT
     { return true; }
 };
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 
 // __wrap_iter
 
@@ -3556,7 +3556,7 @@ public:
     typedef typename iterator_traits<iterator_type>::difference_type   difference_type;
     typedef typename iterator_traits<iterator_type>::pointer           pointer;
     typedef typename iterator_traits<iterator_type>::reference         reference;
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     typedef contiguous_iterator_tag iterator_concept;
 #endif
 private:
@@ -3894,11 +3894,11 @@ template <class _Iter>
 struct __libcpp_is_trivial_iterator<__wrap_iter<_Iter> >
     : public _LIBCPP_BOOL_CONSTANT(__libcpp_is_trivial_iterator<_Iter>::value) {};
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
 template <class _Iter>
 struct __libcpp_is_trivial_iterator<counted_iterator<_Iter> >
     : public _LIBCPP_BOOL_CONSTANT(__libcpp_is_trivial_iterator<_Iter>::value) {};
-#endif // _LIBCPP_HAS_RANGES
+#endif // _STL_HAS_RANGES
 
 template <class _Tp, size_t _Np>
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX11

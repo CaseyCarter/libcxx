@@ -1299,19 +1299,21 @@ _LIBCPP_FUNC_VIS extern "C" void __sanitizer_annotate_contiguous_container(
 // __cpp_concepts to detect support, and speculate that C++20-compliant
 // compilers will define __cpp_concepts to at least 201707 - the date of the
 // Toronto WG21 meeting that incorporated Concepts into the WD.
-#if !defined(__cpp_concepts) || __cpp_concepts < 201507L
-#define _LIBCPP_HAS_NO_CONCEPTS
-#endif
-
-#if !defined(_LIBCPP_HAS_NO_CONCEPTS)
-# if __cpp_concepts < 201707L
-#  define _LIBCPP_CONCEPT_DECL concept bool
+#if defined(__cpp_concepts) && __cpp_concepts >= 201507L
+# define _STL_HAS_CONCEPTS 1
+# if __cpp_concepts <= 201507L
+#  define _STL_CONCEPT_DECL concept bool
 # else
-#  define _LIBCPP_CONCEPT_DECL concept
+#  define _STL_CONCEPT_DECL concept
 # endif //  __cpp_concepts < 201707L
 # if _LIBCPP_STD_VER > 17
-#  define _LIBCPP_HAS_RANGES
+#  define _STL_HAS_RANGES 1
 # endif
+#else
+# define _STL_HAS_CONCEPTS 0
+#endif
+#ifndef _STL_HAS_RANGES
+# define _STL_HAS_RANGES 0
 #endif
 
 // FIXME: Correct this macro when either (A) a feature test macro for the

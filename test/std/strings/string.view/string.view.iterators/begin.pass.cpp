@@ -38,7 +38,7 @@ test(S s)
     assert(  b == cb2);
     assert(cb1 == cb2);
 
-#ifdef _LIBCPP_HAS_RANGES
+#ifdef _STL_HAS_RANGES
     // Test rvalue friend begin overloads
     assert(std::ranges::begin(S{s})  == std::ranges::begin(s));
     assert(std::ranges::cbegin(S{s}) == std::ranges::cbegin(s));

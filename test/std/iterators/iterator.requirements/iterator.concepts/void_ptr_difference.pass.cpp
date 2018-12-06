@@ -16,7 +16,7 @@
 // Bug test for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=78173
 
 template <class _Tp>
-_LIBCPP_CONCEPT_DECL CanDifference =
+_STL_CONCEPT_DECL CanDifference =
     requires(const _Tp& __x, const _Tp& __y) {
         __x - __y;
     };
