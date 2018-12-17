@@ -116,12 +116,8 @@ namespace example {
             A* a;
             Proxy(A& a) : a{&a} {}
             friend void swap(Proxy&& x, Proxy&& y) {
-                std::ranges::swap(x.a, y.a);
+                std::ranges::swap(*x.a, *y.a);
             }
-            friend void swap(A& x, Proxy p) {
-                std::ranges::swap(x.m, p.a->m);
-            }
-            friend void swap(Proxy p, A& x) { swap(x, p); }
         };
         Proxy proxy(A& a) { return Proxy(a); }
      }
@@ -135,8 +131,25 @@ namespace example {
         value_swap(a1, proxy(a2));
         assert(a1.m == -5);
         assert(a2.m == 5);
+
+        // Additional checks for paths not exercised by the example
+        value_swap(proxy(a1), a2);
+        assert(a1.m == 5);
+        assert(a2.m == -5);
+
+        value_swap(proxy(a1), proxy(a2));
+        assert(a1.m == -5);
+        assert(a2.m == 5);
+
+        N::Proxy p1{a1}, p2{a2};
+        std::ranges::swap(p1, p2);
+        assert(a1.m == -5);
+        assert(a2.m == 5);
+        assert(p1.a == &a2);
+        assert(p2.a == &a1);
     }
 }
+
 int main() {
     {
         using namespace stl2;
