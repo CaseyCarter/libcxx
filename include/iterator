@@ -1126,7 +1126,7 @@ struct _LIBCPP_TEMPLATE_VIS iterator_traits<_Iter>
     using reference         = typename _Iter::reference;
     using iterator_category = typename _Iter::iterator_category;
 
-    using __is_not_specialized = iterator_traits<_Iter>;
+    using __is_not_specialized = iterator_traits;
 };
 
 template <int>
